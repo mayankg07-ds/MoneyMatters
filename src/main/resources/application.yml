@@ -34,14 +34,12 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
-      default-property-inclusion: non_null
       indent-output: true
-    time-zone: UTC
-    default-timezone: UTC
+    default-property-inclusion: non_null
 
 # Server Configuration
 server:
-  port: 8080
+  port: 8082
   servlet:
     context-path: /api
   error:
@@ -54,10 +52,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "*"
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
+    shutdown:
+      enabled: true
 
 # Logging Configuration
 logging:
