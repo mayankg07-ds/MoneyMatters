@@ -134,5 +134,53 @@ public class RetirementPlannerServiceTest {
         assertEquals(BigDecimal.ZERO, response.getRecommendedMonthlySIP());
         assertEquals(BigDecimal.ZERO, response.getCorpusShortfall());
     }
-}
 
+@Test
+@DisplayName("High inflation scenario")
+void testHighInflationScenario() {
+    RetirementPlanRequest request = new RetirementPlanRequest(
+        25, 60, 85,
+        new BigDecimal("40000"),
+        new BigDecimal("10"),  // 10% inflation!
+        new BigDecimal("15"),
+        new BigDecimal("9"),
+        new BigDecimal("500000")
+    );
+
+    RetirementPlanResponse response = service.calculateRetirementPlan(request);
+
+        // With 10% inflation over 35 years, expenses skyrocket
+        assertTrue(response.getInflatedMonthlyExpenseAtRetirement()
+            .compareTo(new BigDecimal("1000000")) > 0);
+
+        // Required corpus will be substantial (multiple crores)
+        assertTrue(response.getRequiredCorpusAtRetirement()
+            .compareTo(new BigDecimal("50000000")) > 0); // > 5 crores
+
+        // Recommended SIP (with 15% returns, even small SIP becomes large)
+        assertTrue(response.getRecommendedMonthlySIP()
+            .compareTo(new BigDecimal("4000")) > 0);
+    }
+
+    @Test
+    @DisplayName("Conservative returns scenario")
+    void testConservativeReturnsScenario() {
+        RetirementPlanRequest request = new RetirementPlanRequest(
+            35, 60, 80,
+            new BigDecimal("75000"),
+            new BigDecimal("5"),
+            new BigDecimal("7"),   // Low pre-retirement return
+            new BigDecimal("5"),   // Low post-retirement return
+            new BigDecimal("2000000")
+        );
+
+        RetirementPlanResponse response = service.calculateRetirementPlan(request);
+
+        // Lower returns mean higher SIP needed
+        assertTrue(response.getRecommendedMonthlySIP().compareTo(BigDecimal.ZERO) > 0);
+        
+        // Projections should show slower growth
+        assertNotNull(response.getPreRetirementProjections());
+        assertTrue(response.getPreRetirementProjections().size() > 0);
+    }
+}
