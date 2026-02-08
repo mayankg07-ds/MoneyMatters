@@ -44,6 +44,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Actuator for health/metrics endpoints -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Database - H2 for dev, PostgreSQL for prod -->
         <dependency>
             <groupId>com.h2database</groupId>
