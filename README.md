@@ -91,3 +91,81 @@ A financial project.
   "message": "Retirement plan calculated successfully"
 }
 ```
+
+## Loan Analyzer API
+
+### Analyze Single Loan
+
+**Endpoint**
+
+`POST /api/v1/calculators/loan/analyze`
+
+**Request Body**
+
+```json
+{
+  "principal": 500000,
+  "annualInterestRatePercent": 10,
+  "tenureMonths": 60,
+  "prepayments": [
+    {
+      "atMonth": 12,
+      "amount": 50000,
+      "option": "REDUCE_TENURE"
+    }
+  ]
+}
+```
+
+**Response Highlights**
+
+- **EMI**: ₹10,624
+- **Total Interest**: ₹1,14,742 (after prepayment savings)
+- **Full amortization schedule**: 54 monthly breakdowns (reduced from 60)
+- **Prepayment Impact**: 
+  - Tenure reduced by 6 months
+  - Interest saved: ₹22,669
+  - Original total cost: ₹6,37,411
+  - New total cost: ₹6,14,742
+
+**Response Structure**
+
+```json
+{
+  "success": true,
+  "data": {
+    "emi": 10623.52,
+    "totalAmountPayable": 614742.16,
+    "totalInterestPayable": 114742.16,
+    "effectiveTenureMonths": 54,
+    "principal": 500000.00,
+    "interestToLoanPercentage": 22.95,
+    "amortizationSchedule": [
+      {
+        "month": 1,
+        "emi": 10623.52,
+        "principalPaid": 6456.85,
+        "interestPaid": 4166.67,
+        "prepaymentAmount": 0.00,
+        "closingBalance": 493543.15
+      }
+    ],
+    "prepaymentImpact": {
+      "totalPrepaymentAmount": 50000.00,
+      "interestSaved": 22669.16,
+      "monthsSaved": 6,
+      "newEMI": 10623.52,
+      "originalTotalCost": 637411.20,
+      "newTotalCost": 614742.16
+    },
+    "principalVsInterestChart": [...],
+    "balanceOverTimeChart": [...]
+  },
+  "message": "Loan analysis completed successfully"
+}
+```
+
+**Prepayment Options**
+
+- `REDUCE_TENURE`: Keep EMI same, reduce loan duration
+- `REDUCE_EMI`: Keep tenure same, reduce monthly EMI
