@@ -37,7 +37,21 @@ public class LoanAnalyzerServiceImpl implements LoanAnalyzerService {
             request.getAnnualInterestRatePercent()
         ).divide(new BigDecimal(12), 10, RoundingMode.HALF_UP);
 
-        // Generate amortization schedule
+        // Generate amortization schedule WITHOUT prepayments first (for original values)
+        List<MonthlyPaymentBreakdown> originalSchedule = generateAmortizationSchedule(
+            request.getPrincipal(),
+            emi,
+            monthlyRate,
+            request.getTenureMonths(),
+            null  // No prepayments for original calculation
+        );
+
+        // Calculate original total interest (without prepayments)
+        BigDecimal originalTotalInterest = originalSchedule.stream()
+            .map(MonthlyPaymentBreakdown::getInterestPaid)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Generate amortization schedule WITH prepayments (for actual values)
         List<MonthlyPaymentBreakdown> schedule = generateAmortizationSchedule(
             request.getPrincipal(),
             emi,
@@ -46,7 +60,7 @@ public class LoanAnalyzerServiceImpl implements LoanAnalyzerService {
             request.getPrepayments()
         );
 
-        // Calculate totals from schedule
+        // Calculate totals from schedule (with prepayments if any)
         BigDecimal totalInterest = schedule.stream()
             .map(MonthlyPaymentBreakdown::getInterestPaid)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -62,7 +76,7 @@ public class LoanAnalyzerServiceImpl implements LoanAnalyzerService {
         PrepaymentImpact prepaymentImpact = calculatePrepaymentImpact(
             request,
             emi,
-            totalInterest,
+            originalTotalInterest,  // Use original interest (without prepayments)
             schedule
         );
 
