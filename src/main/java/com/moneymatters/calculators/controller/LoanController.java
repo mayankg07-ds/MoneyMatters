@@ -1,4 +1,5 @@
-package com.moneymatters.calculators.controller;
+package 
+com.moneymatters.calculators.controller;
 
 import com.moneymatters.calculators.dto.LoanAnalysisRequest;
 import com.moneymatters.calculators.dto.LoanAnalysisResponse;
