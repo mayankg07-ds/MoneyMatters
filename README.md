@@ -2,6 +2,17 @@
 
 A financial project.
 
+## All 6 Calculators Complete
+
+1. **SIP Step-up** - `/v1/calculators/sip-stepup/calculate`
+2. **Retirement Planner** - `/v1/calculators/retirement/plan`
+3. **Loan Analyzer** - `/v1/calculators/loan/analyze`
+4. **Asset Allocation** - `/v1/calculators/asset-allocation/rebalance`
+5. **Cashflow Planner** - `/v1/calculators/cashflow/project`
+6. **SWP Calculator** - `/v1/calculators/swp/calculate`
+
+---
+
 ## SIP Step-up Calculator API
 
 **Endpoint**
