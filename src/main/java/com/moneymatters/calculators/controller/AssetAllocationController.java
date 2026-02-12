@@ -5,15 +5,17 @@ import com.moneymatters.calculators.service.AssetAllocationService;
 import com.moneymatters.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/calculators/asset-allocation")
 @RequiredArgsConstructor
-@Slf4j
 public class AssetAllocationController {
+
+    private static final Logger log = LoggerFactory.getLogger(AssetAllocationController.class);
 
     private final AssetAllocationService assetAllocationService;
 

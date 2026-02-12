@@ -25,3 +25,4 @@ public interface HoldingRepository extends JpaRepository<Holding, Long> {
 
     boolean existsByUserIdAndAssetSymbol(Long userId, String assetSymbol);
 }
+    
