@@ -15,6 +15,14 @@ import java.time.LocalDateTime;
 @Builder
 public class Holding {
 
+    public enum AssetType {
+        STOCK,
+        MUTUAL_FUND,
+        ETF,
+        BOND,
+        GOLD
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,7 +43,7 @@ public class Holding {
     private BigDecimal quantity;
 
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal averageBuyPrice;
+    private BigDecimal avgBuyPrice;
 
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal totalInvested;
@@ -52,8 +60,9 @@ public class Holding {
     @Column(precision = 10, scale = 4)
     private BigDecimal unrealizedGainPercent;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private String assetType;  // "STOCK", "MUTUAL_FUND", "ETF"
+    private AssetType assetType;
 
     @Column
     private LocalDate purchaseDate;

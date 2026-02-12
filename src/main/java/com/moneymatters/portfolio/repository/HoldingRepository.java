@@ -16,7 +16,9 @@ public interface HoldingRepository extends JpaRepository<Holding, Long> {
     @Query("SELECT h FROM Holding h WHERE h.userId = :userId AND h.active = true")
     List<Holding> findActiveHoldingsByUserId(@Param("userId") Long userId);
 
-    List<Holding> findByUserIdAndAssetType(Long userId, String assetType);
+    List<Holding> findByUserIdAndAssetType(Long userId, Holding.AssetType assetType);
 
     List<Holding> findByAssetSymbol(String assetSymbol);
+
+    boolean existsByUserIdAndAssetSymbol(Long userId, String assetSymbol);
 }
