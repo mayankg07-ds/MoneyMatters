@@ -4,7 +4,6 @@ import com.moneymatters.portfolio.dto.HoldingRequest;
 import com.moneymatters.portfolio.dto.HoldingResponse;
 import com.moneymatters.portfolio.dto.PortfolioSummaryResponse;
 import com.moneymatters.portfolio.entity.Holding;
-import com.moneymatters.portfolio.repository.HoldingRepository;
 import com.moneymatters.portfolio.service.HoldingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,9 +21,6 @@ public class HoldingServiceTest {
 
     @Autowired
     private HoldingService holdingService;
-
-    @Autowired
-    private HoldingRepository holdingRepository;
 
     @Test
     void testCreateHolding() {
