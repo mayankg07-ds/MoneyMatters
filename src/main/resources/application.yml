@@ -3,6 +3,13 @@ spring:
     name: MoneyMatters
     version: 1.0.0
 
+  # Cache Configuration
+  cache:
+    type: simple  # Use simple in-memory cache
+    cache-names:
+      - stockPrices
+      - portfolioAnalytics
+
   # Database Configuration (H2 for development)
   datasource:
     url: jdbc:h2:mem:moneymatters-db

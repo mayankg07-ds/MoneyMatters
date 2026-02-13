@@ -25,6 +25,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final HoldingRepository holdingRepository;
     private final HoldingService holdingService;
+    private final PortfolioAnalyticsService portfolioAnalyticsService;
 
     @Override
     @Transactional
@@ -78,6 +79,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         log.info("Transaction recorded with ID: {}", saved.getId());
+        
+        // Clear analytics cache for the user
+        portfolioAnalyticsService.clearAnalyticsCache(request.getUserId());
+        
         return TransactionResponse.fromEntity(saved);
     }
 
@@ -228,19 +233,29 @@ public class TransactionServiceImpl implements TransactionService {
             holdingService.createHolding(holdingRequest);
         } else {
             // Update existing holding - recalculate average price
-            BigDecimal totalCost = holding.getTotalInvested()
-                .add(request.getQuantity().multiply(request.getPricePerUnit()));
+            BigDecimal transactionCost = request.getQuantity().multiply(request.getPricePerUnit());
+            BigDecimal charges = request.getCharges() != null ? request.getCharges() : BigDecimal.ZERO;
             
             BigDecimal totalQty = holding.getQuantity().add(request.getQuantity());
             
-            BigDecimal newAvgPrice = totalCost.divide(totalQty, 2, RoundingMode.HALF_UP);
+            // avgBuyPrice = total stock cost / total quantity (excluding charges)
+            BigDecimal totalStockCost = holding.getAvgBuyPrice().multiply(holding.getQuantity())
+                .add(transactionCost);
+            BigDecimal newAvgPrice = totalStockCost.divide(totalQty, 2, RoundingMode.HALF_UP);
+            
+            // totalInvested = total stock cost + all charges
+            BigDecimal totalCost = holding.getTotalInvested()
+                .add(transactionCost)
+                .add(charges);
 
             holding.setQuantity(totalQty);
             holding.setAvgBuyPrice(newAvgPrice);
             holding.setTotalInvested(totalCost);
 
             // Recalculate current value
-            BigDecimal currentValue = holding.getCurrentPrice().multiply(totalQty);
+            BigDecimal currentPrice = holding.getCurrentPrice() != null ? 
+                holding.getCurrentPrice() : newAvgPrice;
+            BigDecimal currentValue = currentPrice.multiply(totalQty);
             holding.setCurrentValue(currentValue);
             
             BigDecimal unrealizedGain = currentValue.subtract(totalCost);
@@ -289,7 +304,9 @@ public class TransactionServiceImpl implements TransactionService {
             BigDecimal newTotalInvested = holding.getTotalInvested().subtract(costBasisRemoved);
             holding.setTotalInvested(newTotalInvested);
 
-            BigDecimal newCurrentValue = holding.getCurrentPrice().multiply(newQty);
+            BigDecimal currentPrice = holding.getCurrentPrice() != null ?
+                holding.getCurrentPrice() : holding.getAvgBuyPrice();
+            BigDecimal newCurrentValue = currentPrice.multiply(newQty);
             holding.setCurrentValue(newCurrentValue);
 
             BigDecimal newUnrealizedGain = newCurrentValue.subtract(newTotalInvested);
@@ -323,7 +340,9 @@ public class TransactionServiceImpl implements TransactionService {
         holding.setAvgBuyPrice(newAvgPrice);
 
         // Recalculate current value
-        BigDecimal currentValue = holding.getCurrentPrice().multiply(newQty);
+        BigDecimal currentPrice = holding.getCurrentPrice() != null ?
+            holding.getCurrentPrice() : newAvgPrice;
+        BigDecimal currentValue = currentPrice.multiply(newQty);
         holding.setCurrentValue(currentValue);
 
         BigDecimal unrealizedGain = currentValue.subtract(holding.getTotalInvested());

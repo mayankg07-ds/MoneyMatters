@@ -4,7 +4,9 @@ import com.moneymatters.portfolio.dto.HoldingRequest;
 import com.moneymatters.portfolio.dto.HoldingResponse;
 import com.moneymatters.portfolio.dto.PortfolioSummaryResponse;
 import com.moneymatters.portfolio.entity.Holding;
+import com.moneymatters.portfolio.entity.Transaction;
 import com.moneymatters.portfolio.repository.HoldingRepository;
+import com.moneymatters.portfolio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,8 @@ public class HoldingServiceImpl implements HoldingService {
 
     private final HoldingRepository holdingRepository;
     private final StockPriceService stockPriceService;
+    private final TransactionRepository transactionRepository;
+    private final PortfolioAnalyticsService portfolioAnalyticsService;
 
     @Override
     @Transactional
@@ -76,6 +80,27 @@ public class HoldingServiceImpl implements HoldingService {
         Holding saved = holdingRepository.save(holding);
         log.info("Holding created with ID: {}", saved.getId());
 
+        // Create initial BUY transaction for tracking cost basis
+        Transaction initialTransaction = Transaction.builder()
+            .userId(request.getUserId())
+            .holdingId(saved.getId())
+            .transactionType(Transaction.TransactionType.BUY)
+            .assetType(request.getAssetType())
+            .assetName(request.getAssetName())
+            .assetSymbol(request.getAssetSymbol())
+            .quantity(request.getQuantity())
+            .pricePerUnit(request.getAvgBuyPrice())
+            .totalAmount(totalInvested)
+            .charges(BigDecimal.ZERO)
+            .netAmount(totalInvested)
+            .transactionDate(holding.getPurchaseDate())
+            .notes("Initial holding creation")
+            .build();
+        transactionRepository.save(initialTransaction);
+
+        // Clear analytics cache for the user
+        portfolioAnalyticsService.clearAnalyticsCache(request.getUserId());
+
         return HoldingResponse.fromEntity(saved);
     }
 
@@ -102,6 +127,9 @@ public class HoldingServiceImpl implements HoldingService {
         Holding updated = holdingRepository.save(holding);
         log.info("Holding updated: {}", id);
 
+        // Clear analytics cache for the user
+        portfolioAnalyticsService.clearAnalyticsCache(holding.getUserId());
+
         return HoldingResponse.fromEntity(updated);
     }
 
@@ -110,12 +138,15 @@ public class HoldingServiceImpl implements HoldingService {
     public void deleteHolding(Long id) {
         log.info("Deleting holding ID: {}", id);
 
-        if (!holdingRepository.existsById(id)) {
-            throw new RuntimeException("Holding not found with ID: " + id);
-        }
-
+        Holding holding = holdingRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + id));
+        
+        Long userId = holding.getUserId();
         holdingRepository.deleteById(id);
         log.info("Holding deleted: {}", id);
+        
+        // Clear analytics cache for the user
+        portfolioAnalyticsService.clearAnalyticsCache(userId);
     }
 
     @Override
@@ -246,6 +277,9 @@ public class HoldingServiceImpl implements HoldingService {
             calculateHoldingValues(holding, currentPrice);
             holdingRepository.save(holding);
             log.info("Price refreshed for holding {}: {}", holdingId, currentPrice);
+            
+            // Clear analytics cache for the user
+            portfolioAnalyticsService.clearAnalyticsCache(holding.getUserId());
         } else {
             log.warn("Could not refresh price for holding: {}", holdingId);
         }
@@ -286,6 +320,9 @@ public class HoldingServiceImpl implements HoldingService {
 
         holdingRepository.saveAll(holdings);
         log.info("Refreshed prices for {} holdings", holdings.size());
+        
+        // Clear analytics cache for the user
+        portfolioAnalyticsService.clearAnalyticsCache(userId);
     }
 
     /**

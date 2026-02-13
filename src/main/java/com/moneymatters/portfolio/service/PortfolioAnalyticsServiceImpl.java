@@ -8,6 +8,8 @@ import com.moneymatters.portfolio.repository.TransactionRepository;
 import com.moneymatters.portfolio.util.XIRRCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "portfolioAnalytics", key = "#userId")
     public PortfolioAnalyticsResponse getPortfolioAnalytics(Long userId) {
         log.info("Generating portfolio analytics for user: {}", userId);
 
@@ -280,5 +283,14 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
             BigDecimal.ZERO, LocalDate.now(), LocalDate.now(), 0, 0.0,
             new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), BigDecimal.ZERO
         );
+    }
+
+    /**
+     * Clear analytics cache when portfolio is updated
+     * This method is called by TransactionService and HoldingService
+     */
+    @CacheEvict(value = "portfolioAnalytics", key = "#userId")
+    public void clearAnalyticsCache(Long userId) {
+        log.info("Clearing analytics cache for user: {}", userId);
     }
 }

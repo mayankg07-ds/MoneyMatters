@@ -1,5 +1,6 @@
-package com.moneymatters.portfolio.util;
+package com.moneymatters.portfolio;
 
+import com.moneymatters.portfolio.util.XIRRCalculator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 

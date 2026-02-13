@@ -9,4 +9,9 @@ public interface PortfolioAnalyticsService {
     
     PortfolioAnalyticsResponse getPortfolioAnalyticsForDateRange(
         Long userId, LocalDate startDate, LocalDate endDate);
+    
+    /**
+     * Clear analytics cache when portfolio is updated
+     */
+    void clearAnalyticsCache(Long userId);
 }
