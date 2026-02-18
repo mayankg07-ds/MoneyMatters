@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoneyMatters Dashboard Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0dccf2",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101f22",
+                        "slate-custom": "#1f2937",
+                        "neutral-custom": "#f9fafb",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Roboto Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .financial-val {
+            font-family: 'Roboto Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 bg-slate-custom flex-shrink-0 flex flex-col hidden lg:flex">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-white">account_balance_wallet</span>
+</div>
+<h1 class="text-white text-xl font-extrabold tracking-tight">MoneyMatters</h1>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-2">
+<a class="flex items-center space-x-3 bg-primary text-white px-4 py-3 rounded-lg" href="#">
+<span class="material-icons">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 text-slate-400 hover:text-white hover:bg-slate-700/50 px-4 py-3 rounded-lg transition-colors" href="#">
+<span class="material-icons">pie_chart</span>
+<span class="font-medium">Portfolio</span>
+</a>
+<a class="flex items-center space-x-3 text-slate-400 hover:text-white hover:bg-slate-700/50 px-4 py-3 rounded-lg transition-colors" href="#">
+<span class="material-icons">swap_horiz</span>
+<span class="font-medium">Transactions</span>
+</a>
+<a class="flex items-center space-x-3 text-slate-400 hover:text-white hover:bg-slate-700/50 px-4 py-3 rounded-lg transition-colors" href="#">
+<span class="material-icons">insights</span>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center space-x-3 text-slate-400 hover:text-white hover:bg-slate-700/50 px-4 py-3 rounded-lg transition-colors" href="#">
+<span class="material-icons">account_balance</span>
+<span class="font-medium">Banks</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-700">
+<a class="flex items-center space-x-3 text-slate-400 hover:text-white transition-colors" href="#">
+<span class="material-icons">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-neutral-custom dark:bg-background-dark p-8">
+<!-- Header -->
+<header class="mb-10 flex justify-between items-center">
+<div>
+<h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">Welcome back, Alex!</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Here's what's happening with your portfolio today.</p>
+</div>
+<div class="flex items-center space-x-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+<span class="material-icons text-xl">notifications</span>
+</button>
+<img alt="Profile" class="w-10 h-10 rounded-full border-2 border-primary" data-alt="Close-up portrait of a professional man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN46lJcNq3IC9E4ZEX5d1c85n1ZMU5Y1XBBKqOMzZeB9N4ZM4SCiy7PTwnw7frdk351pd-ZBboAn9VudokfdRFIPFMpl4Omx0hitS7FuIDJ2lU8QMu_P2_Xa6Ad2CGakQJTYv8gsSHt79hIwIFzvgtPPeaTWm080lwF8ORuiXmT_AOVz7C3uNS9gx0_1kzCdyXM-o2L2oqA3szhCzRnbm4q0_AzhaHbzujUzW54vHSa40w7fSifHxqN-hhhHrt-IkTZYHEa2ejkJ9O"/>
+</div>
+</header>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<!-- Total Inv. -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total Invested</span>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">payments</span>
+</div>
+</div>
+<div class="text-2xl font-bold financial-val text-slate-900 dark:text-white">₹ 12,45,000</div>
+<div class="mt-4 flex items-center text-xs text-slate-400 font-medium">
+                        Since inception
+                    </div>
+</div>
+<!-- Curr. Value -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Current Value</span>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">account_balance_wallet</span>
+</div>
+</div>
+<div class="text-2xl font-bold financial-val text-slate-900 dark:text-white">₹ 14,82,230</div>
+<div class="mt-4 flex items-center text-green-500 font-bold text-sm">
+<span class="material-icons text-xs mr-1">trending_up</span>
+                        +1.2% Today
+                    </div>
+</div>
+<!-- Total Gain -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total Gain</span>
+<div class="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg">
+<span class="material-icons text-green-600 dark:text-green-400">trending_up</span>
+</div>
+</div>
+<div class="text-2xl font-bold financial-val text-green-600 dark:text-green-400">₹ +2,37,230</div>
+<div class="mt-4 flex items-center text-slate-400 text-sm">
+                        Absolute Returns: <span class="text-green-500 font-bold ml-1">19.05%</span>
+</div>
+</div>
+<!-- XIRR Rate -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md border-l-4 border-l-primary">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">XIRR Rate</span>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">speed</span>
+</div>
+</div>
+<div class="text-2xl font-bold financial-val text-slate-900 dark:text-white">15.42%</div>
+<div class="mt-4 flex items-center text-slate-400 text-sm">
+                        Annualized Performance
+                    </div>
+</div>
+</div>
+<!-- Tables Section -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+<!-- Recent Holdings -->
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col">
+<div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Top Holdings</h3>
+<a class="text-primary hover:underline text-sm font-bold flex items-center" href="#">
+                            View All <span class="material-icons text-sm ml-1">chevron_right</span>
+</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Asset Name</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Invested</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Current</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">P&amp;L%</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mr-3">
+<span class="text-xs font-bold text-blue-600 dark:text-blue-400">R</span>
+</div>
+<span class="font-bold text-slate-700 dark:text-slate-200">Reliance Industries</span>
+</div>
+</td>
+<td class="px-6 py-4 financial-val text-slate-600 dark:text-slate-400">₹ 2,40,000</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 2,84,500</td>
+<td class="px-6 py-4">
+<span class="text-green-500 font-bold">+18.5%</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center mr-3">
+<span class="text-xs font-bold text-red-600 dark:text-red-400">H</span>
+</div>
+<span class="font-bold text-slate-700 dark:text-slate-200">HDFC Bank Ltd.</span>
+</div>
+</td>
+<td class="px-6 py-4 financial-val text-slate-600 dark:text-slate-400">₹ 1,85,000</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 1,98,200</td>
+<td class="px-6 py-4">
+<span class="text-green-500 font-bold">+7.1%</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center mr-3">
+<span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">I</span>
+</div>
+<span class="font-bold text-slate-700 dark:text-slate-200">Infosys Ltd.</span>
+</div>
+</td>
+<td class="px-6 py-4 financial-val text-slate-600 dark:text-slate-400">₹ 1,20,000</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 1,45,000</td>
+<td class="px-6 py-4">
+<span class="text-green-500 font-bold">+20.8%</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center mr-3">
+<span class="text-xs font-bold text-yellow-600 dark:text-yellow-400">T</span>
+</div>
+<span class="font-bold text-slate-700 dark:text-slate-200">TCS</span>
+</div>
+</td>
+<td class="px-6 py-4 financial-val text-slate-600 dark:text-slate-400">₹ 95,000</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 92,400</td>
+<td class="px-6 py-4">
+<span class="text-red-500 font-bold">-2.7%</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center mr-3">
+<span class="text-xs font-bold text-green-600 dark:text-green-400">B</span>
+</div>
+<span class="font-bold text-slate-700 dark:text-slate-200">Bajaj Finance</span>
+</div>
+</td>
+<td class="px-6 py-4 financial-val text-slate-600 dark:text-slate-400">₹ 1,50,000</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 1,68,900</td>
+<td class="px-6 py-4">
+<span class="text-green-500 font-bold">+12.6%</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recent Transactions -->
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col">
+<div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Transactions</h3>
+<a class="text-primary hover:underline text-sm font-bold flex items-center" href="#">
+                            View All <span class="material-icons text-sm ml-1">chevron_right</span>
+</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Asset</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Type</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">24 Oct, 2023</td>
+<td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">Reliance Ind.</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-full text-xs font-extrabold uppercase tracking-tighter">Buy</span>
+</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 12,450</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">22 Oct, 2023</td>
+<td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">Tata Motors</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full text-xs font-extrabold uppercase tracking-tighter">Sell</span>
+</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 8,900</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">18 Oct, 2023</td>
+<td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">ICICI Bank</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-full text-xs font-extrabold uppercase tracking-tighter">Buy</span>
+</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 25,000</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">15 Oct, 2023</td>
+<td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">Apple Inc.</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-full text-xs font-extrabold uppercase tracking-tighter">Buy</span>
+</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 42,300</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">12 Oct, 2023</td>
+<td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">SBI Bluechip Fund</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full text-xs font-extrabold uppercase tracking-tighter">SIP</span>
+</td>
+<td class="px-6 py-4 financial-val text-slate-900 dark:text-white font-medium">₹ 10,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Promotion / Action Banner -->
+<div class="mt-10 bg-gradient-to-r from-primary to-blue-500 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between shadow-lg shadow-primary/20">
+<div class="mb-6 md:mb-0">
+<h3 class="text-2xl font-bold">Optimize your portfolio</h3>
+<p class="opacity-90 max-w-md mt-2">Our AI-driven analysis suggests you could save ₹ 1,200 in monthly fees by consolidating your MF portfolios.</p>
+</div>
+<button class="bg-white text-primary font-bold px-8 py-3 rounded-xl hover:bg-slate-50 transition-colors shadow-md">
+                    Start Optimization
+                </button>
+</div>
+</main>
+</div>
+</body></html>

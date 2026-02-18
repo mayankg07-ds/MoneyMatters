@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Money Matters Dashboard Overview</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Roboto+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sidebar: '#1f2937',
+                        content: '#f9fafb',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        primary: '#3b82f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-content font-sans text-gray-800 antialiased h-screen flex overflow-hidden">
+<aside class="w-64 bg-sidebar text-white flex flex-col flex-shrink-0 z-20">
+<div class="h-16 flex items-center px-6 border-b border-gray-700">
+<span class="material-symbols-outlined text-green-400 mr-2">savings</span>
+<h1 class="font-bold text-lg tracking-wide">Money Matters</h1>
+</div>
+<nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+<a class="flex items-center px-3 py-2.5 bg-gray-700/50 text-white rounded-md group transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-gray-300 group-hover:text-white">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md group transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-gray-400 group-hover:text-white">pie_chart</span>
+<span class="font-medium">Portfolio</span>
+</a>
+<a class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md group transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-gray-400 group-hover:text-white">receipt_long</span>
+<span class="font-medium">Transactions</span>
+</a>
+<a class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md group transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-gray-400 group-hover:text-white">monitoring</span>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md group transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-gray-400 group-hover:text-white">account_balance</span>
+<span class="font-medium">Bank Accounts</span>
+</a>
+</nav>
+<div class="p-4 border-t border-gray-700">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAji6SQ4OPDhUAzjhaIBhMtSOaMhxYYK3BknofMngS5rGzmTF1lMn_St5kRZN_DxyZzZoXdBqRCHU62HtpZ8hrSKJVo6c6M8LfpMuPaWj2uv5Ivmbj72ug1AH4YkPwApyinhCYbcWkK4XMLCutdB4Q971fhCh8UWHsiJyWZkptHjBvi03xYAXYWWL06I3VcdujSRjzuAN1QZ3KD4JjbTvWxQfL63K0zUX-ks_kPXmE-TJs_ZID95XB9YGhz_tp9neEIjGt56oZB6LNF"/>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Alex Morgan</p>
+<p class="text-xs text-gray-400">View Profile</p>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10 flex-shrink-0">
+<div class="flex items-center w-full max-w-md">
+<div class="relative w-full text-gray-400 focus-within:text-gray-600">
+<div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm bg-transparent" id="search" name="search" placeholder="Search assets, transactions..." type="search"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative p-1.5 text-gray-400 hover:text-gray-500 focus:outline-none">
+<span class="sr-only">View notifications</span>
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+</button>
+<button class="ml-2 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-[6px] text-white bg-sidebar hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+<span class="material-symbols-outlined text-[18px] mr-2">add</span>
+                    New Investment
+                </button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto bg-content p-8">
+<div class="max-w-7xl mx-auto space-y-8">
+<div>
+<h2 class="text-2xl font-bold text-gray-900">Welcome back, Alex</h2>
+<p class="mt-1 text-sm text-gray-500">Here's what's happening with your portfolio today.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white rounded-lg p-6 shadow-subtle border border-gray-100 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<p class="text-sm font-medium text-gray-500">Total Investment</p>
+<div class="p-1.5 bg-blue-50 rounded-md">
+<span class="material-symbols-outlined text-blue-600 text-[20px]">account_balance_wallet</span>
+</div>
+</div>
+<div>
+<p class="text-2xl font-bold text-gray-900 font-mono">₹8,45,200</p>
+</div>
+</div>
+<div class="bg-white rounded-lg p-6 shadow-subtle border border-gray-100 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<p class="text-sm font-medium text-gray-500">Current Value</p>
+<div class="p-1.5 bg-indigo-50 rounded-md">
+<span class="material-symbols-outlined text-indigo-600 text-[20px]">currency_rupee</span>
+</div>
+</div>
+<div>
+<p class="text-2xl font-bold text-gray-900 font-mono">₹9,82,450</p>
+<p class="text-xs text-gray-400 mt-1">Updated 15 mins ago</p>
+</div>
+</div>
+<div class="bg-white rounded-lg p-6 shadow-subtle border border-gray-100 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<p class="text-sm font-medium text-gray-500">Total Gain</p>
+<div class="p-1.5 bg-green-50 rounded-md">
+<span class="material-symbols-outlined text-success text-[20px]">trending_up</span>
+</div>
+</div>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold text-success font-mono">+₹1,37,250</p>
+<span class="text-xs font-medium text-success mb-1.5 bg-green-50 px-1.5 py-0.5 rounded">+16.24%</span>
+</div>
+</div>
+<div class="bg-white rounded-lg p-6 shadow-subtle border border-gray-100 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<p class="text-sm font-medium text-gray-500">XIRR Rate</p>
+<div class="p-1.5 bg-purple-50 rounded-md">
+<span class="material-symbols-outlined text-purple-600 text-[20px]">percent</span>
+</div>
+</div>
+<div>
+<p class="text-2xl font-bold text-gray-900 font-mono">18.45%</p>
+<p class="text-xs text-gray-400 mt-1">Annualized Return</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-white rounded-lg shadow-subtle border border-gray-100 flex flex-col">
+<div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+<h3 class="text-lg font-semibold text-gray-900">Recent Holdings</h3>
+<a class="text-sm font-medium text-primary hover:text-blue-700" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-100">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Asset</th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Invested</th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Current</th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Gain/Loss</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100">
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center p-2">
+<img alt="Apple" class="h-6 w-6 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3yeaEeJlKllD-HWl0_WgxEh_XgYx_53elFiW5OL072ufZ63RL6Qws5G8GH9-DrBc0b3gERkWZAb2iF1ONMrU0r3KdWXDxbAiXvdC2_l7gVK4R-PKKA6GjRXnYBPUxIR6k9Xc60CxMtMLLEcQvFGdJRlRR-ga0Oo_YS4sYoptnT5Fo70Wz6zfB6EcVasANaIxkFN0jT_xzH9XbpC80vAxh-6vKZj5aqvHHsxsNnp0aZszoG15KhCnHAJ2J340MnMbg1IjECkl008It"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-semibold text-gray-900">Apple Inc.</div>
+<div class="text-xs text-gray-500">AAPL • Stock</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono text-gray-600">
+                                            ₹1,45,000
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-gray-900">
+                                            ₹1,62,400
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-success">
+                                            +₹17,400
+                                        </td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-full flex items-center justify-center">
+<span class="text-blue-600 font-bold text-xs">HDFC</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-semibold text-gray-900">HDFC Bank Ltd</div>
+<div class="text-xs text-gray-500">HDFCBANK • Stock</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono text-gray-600">
+                                            ₹2,10,500
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-gray-900">
+                                            ₹2,05,100
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-danger">
+                                            -₹5,400
+                                        </td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 bg-indigo-50 rounded-full flex items-center justify-center p-2">
+<span class="material-symbols-outlined text-indigo-600">token</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-semibold text-gray-900">Nifty 50 Index Fund</div>
+<div class="text-xs text-gray-500">Direct Growth • Mutual Fund</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono text-gray-600">
+                                            ₹3,50,000
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-gray-900">
+                                            ₹4,10,250
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-success">
+                                            +₹60,250
+                                        </td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 bg-orange-50 rounded-full flex items-center justify-center p-2">
+<img alt="BTC" class="h-6 w-6 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwtEVVsSe9uDpDt08ITurbSj341uNxb7MiITKibuO7NzriEdGf5JYEz9B79LqehYleBAEzZoloOmkxoD4_UozvZSmZS6JhrgtqVzVbWRvimuCDZs0CnAVif9aYTiBb78x0t_DAS4IKpjUDiZYAgLeZPWjLszDdK3suqNjFlE_jYF1w2MBaVEyPGBMoCrelcKTe4r-ICP0Nhy_tl-KIkt3cgrlK1HoQPpFt4qWWWDam3aDCyYICiazmYJmmKschLnpVSCds1rjxwDTU"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-semibold text-gray-900">Bitcoin</div>
+<div class="text-xs text-gray-500">BTC • Crypto</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono text-gray-600">
+                                            ₹50,000
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-gray-900">
+                                            ₹85,400
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-success">
+                                            +₹35,400
+                                        </td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 bg-yellow-50 rounded-full flex items-center justify-center">
+<span class="text-yellow-600 font-bold text-xs">GOLD</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-semibold text-gray-900">Sovereign Gold Bond</div>
+<div class="text-xs text-gray-500">SGB2028 • Commodity</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono text-gray-600">
+                                            ₹89,700
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-gray-900">
+                                            ₹1,19,300
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-mono font-medium text-success">
+                                            +₹29,600
+                                        </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="lg:col-span-1 bg-white rounded-lg shadow-subtle border border-gray-100 flex flex-col h-full">
+<div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+<h3 class="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+<a class="text-sm font-medium text-primary hover:text-blue-700" href="#">View All</a>
+</div>
+<div class="flex-1 overflow-y-auto p-2">
+<ul class="divide-y divide-gray-100">
+<li class="p-4 hover:bg-gray-50 rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-900">Deposit</p>
+<p class="text-xs text-gray-500">Oct 24, 2023</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono font-semibold text-success">+₹25,000</p>
+<p class="text-xs text-gray-400">Success</p>
+</div>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-900">Buy AAPL</p>
+<p class="text-xs text-gray-500">Oct 22, 2023</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono font-semibold text-gray-900">-₹12,450</p>
+<p class="text-xs text-gray-400">Completed</p>
+</div>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-900">Buy SIP</p>
+<p class="text-xs text-gray-500">Oct 15, 2023</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono font-semibold text-gray-900">-₹5,000</p>
+<p class="text-xs text-gray-400">Auto-debit</p>
+</div>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-success">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-900">Dividend</p>
+<p class="text-xs text-gray-500">Oct 12, 2023</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono font-semibold text-success">+₹450</p>
+<p class="text-xs text-gray-400">Received</p>
+</div>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center text-danger">
+<span class="material-symbols-outlined text-[20px]">arrow_outward</span>
+</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-900">Withdrawal</p>
+<p class="text-xs text-gray-500">Oct 01, 2023</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono font-semibold text-gray-900">-₹10,000</p>
+<p class="text-xs text-gray-400">Transfer</p>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

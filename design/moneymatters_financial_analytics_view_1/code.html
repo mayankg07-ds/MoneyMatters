@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoneyMatters Financial Analytics View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0dccf2",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101f22",
+                        "accent-dark": "#1f2937",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .chart-bar { transition: height 0.3s ease; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
+<div class="flex min-h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-accent-dark text-white flex flex-col hidden lg:flex">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-white">account_balance_wallet</span>
+</div>
+<span class="font-bold text-xl tracking-tight">MoneyMatters</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors" href="#">
+<span class="material-icons text-slate-400">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg bg-primary text-white font-semibold" href="#">
+<span class="material-icons">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors text-slate-300" href="#">
+<span class="material-icons">account_balance</span>
+<span>Investments</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors text-slate-300" href="#">
+<span class="material-icons">receipt_long</span>
+<span>Transactions</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors text-slate-300" href="#">
+<span class="material-icons">notifications</span>
+<span>Alerts</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-700/50">
+<div class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+<span class="material-icons text-primary text-sm">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate">Alex Johnson</p>
+<p class="text-xs text-slate-400 truncate">Premium Member</p>
+</div>
+<span class="material-icons text-slate-500 text-sm">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto max-h-screen">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-8 py-6 flex justify-between items-center border-b border-slate-200 dark:border-slate-800">
+<div>
+<h1 class="text-2xl font-bold">Financial Analytics</h1>
+<p class="text-sm text-slate-500">Portfolio performance and asset breakdown</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-white dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
+<button class="px-4 py-1.5 text-xs font-medium bg-primary text-white rounded shadow-sm">1Y</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors">3Y</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors">5Y</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors">ALL</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:border-primary transition-all shadow-sm">
+<span class="material-icons text-sm">calendar_today</span>
+<span>Date Range</span>
+</button>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- Row 1: Performance Metrics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium uppercase tracking-wider">XIRR</span>
+<span class="material-icons text-primary">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">18.42%</h3>
+<span class="text-xs font-bold text-emerald-500">+1.2%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Internal Rate of Return</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium uppercase tracking-wider">CAGR</span>
+<span class="material-icons text-primary/60">show_chart</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">14.15%</h3>
+</div>
+<p class="text-xs text-slate-400 mt-2">Compounded Annual Growth</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium uppercase tracking-wider">Abs. Ret.</span>
+<span class="material-icons text-primary/60">account_balance</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">₹12.4L</h3>
+<span class="text-xs font-bold text-emerald-500">+24.5%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Total Absolute Return</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium uppercase tracking-wider">Days Inv.</span>
+<span class="material-icons text-primary/60">history</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">1,245</h3>
+</div>
+<p class="text-xs text-slate-400 mt-2">Days Since Inception</p>
+</div>
+</div>
+<!-- Row 2: Visualizations -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Asset Allocation (Left) -->
+<div class="lg:col-span-5 bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-lg">Asset Allocation</h4>
+<span class="material-icons text-slate-400 text-sm">more_vert</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="relative w-64 h-64 mb-6">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="45, 100" stroke-width="4"></path>
+<path class="text-indigo-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="30, 100" stroke-dashoffset="-45" stroke-width="4"></path>
+<path class="text-amber-400" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="25, 100" stroke-dashoffset="-75" stroke-width="4"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-bold">100%</span>
+<span class="text-[10px] uppercase text-slate-500 tracking-tighter">Portfolio</span>
+</div>
+</div>
+<div class="w-full grid grid-cols-2 gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<div class="flex-1">
+<div class="flex justify-between items-center text-xs">
+<span class="font-medium">Equities</span>
+<span class="font-bold">45%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+<div class="flex-1">
+<div class="flex justify-between items-center text-xs">
+<span class="font-medium">Debt</span>
+<span class="font-bold">30%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-amber-400"></span>
+<div class="flex-1">
+<div class="flex justify-between items-center text-xs">
+<span class="font-medium">Gold</span>
+<span class="font-bold">25%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-slate-200"></span>
+<div class="flex-1">
+<div class="flex justify-between items-center text-xs">
+<span class="font-medium">Cash</span>
+<span class="font-bold">0%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Gainers vs Losers (Right) -->
+<div class="lg:col-span-7 bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-lg">Top Gainers vs Top Losers</h4>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[10px] uppercase text-slate-500 font-bold">Gains</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-400"></span>
+<span class="text-[10px] uppercase text-slate-500 font-bold">Losses</span>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-between py-4">
+<div class="space-y-6">
+<!-- Gainer 1 -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium px-1">
+<span>Growth Equity Fund</span>
+<span class="text-emerald-500">+42.5%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<!-- Gainer 2 -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium px-1">
+<span>Tech Innovation ETF</span>
+<span class="text-emerald-500">+31.2%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+<!-- Loser 1 -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium px-1">
+<span>Infrastructure Bond</span>
+<span class="text-rose-500">-8.4%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-rose-400 rounded-full" style="width: 20%;"></div>
+</div>
+</div>
+<!-- Loser 2 -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium px-1">
+<span>Global Reit Fund</span>
+<span class="text-rose-500">-12.1%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-rose-400 rounded-full" style="width: 35%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3: Asset-wise Performance Table -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+<h4 class="font-bold text-lg">Asset-wise Performance</h4>
+<button class="text-primary text-sm font-semibold hover:underline">Download CSV</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 text-xs font-bold uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4">Asset Type</th>
+<th class="px-6 py-4 text-right">Invested</th>
+<th class="px-6 py-4 text-right">Current Value</th>
+<th class="px-6 py-4 text-right">Gain (₹)</th>
+<th class="px-6 py-4 text-right">Gain %</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+<span class="material-icons text-primary text-lg">trending_up</span>
+</div>
+<span class="font-semibold">Domestic Equity</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-medium">₹25,40,000</td>
+<td class="px-6 py-4 text-right font-medium">₹32,15,400</td>
+<td class="px-6 py-4 text-right text-emerald-500 font-bold">+₹6,75,400</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-xs font-bold">26.5%</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+<span class="material-icons text-indigo-500 text-lg">account_balance</span>
+</div>
+<span class="font-semibold">Fixed Income / Debt</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-medium">₹12,00,000</td>
+<td class="px-6 py-4 text-right font-medium">₹13,44,000</td>
+<td class="px-6 py-4 text-right text-emerald-500 font-bold">+₹1,44,000</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-xs font-bold">12.0%</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-amber-400/20 flex items-center justify-center">
+<span class="material-icons text-amber-500 text-lg">toll</span>
+</div>
+<span class="font-semibold">Gold &amp; Precious Metals</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-medium">₹5,00,000</td>
+<td class="px-6 py-4 text-right font-medium">₹5,90,000</td>
+<td class="px-6 py-4 text-right text-emerald-500 font-bold">+₹90,000</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-xs font-bold">18.0%</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-800/20 flex items-center justify-center">
+<span class="material-icons text-indigo-800 dark:text-indigo-400 text-lg">public</span>
+</div>
+<span class="font-semibold">Global Investments</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-medium">₹8,00,000</td>
+<td class="px-6 py-4 text-right font-medium">₹7,64,000</td>
+<td class="px-6 py-4 text-right text-rose-500 font-bold">-₹36,000</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded text-xs font-bold">-4.5%</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Bottom Footer Info -->
+<footer class="px-8 py-6 text-slate-400 text-xs flex justify-between items-center border-t border-slate-200 dark:border-slate-800">
+<p>© 2024 MoneyMatters Financial Analytics. All data updated as of today 10:45 AM.</p>
+<div class="flex gap-4">
+<a class="hover:text-primary" href="#">Legal Disclosure</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

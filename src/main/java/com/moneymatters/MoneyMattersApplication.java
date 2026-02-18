@@ -21,7 +21,7 @@ public class MoneyMattersApplication {
     public static void main(String[] args) {
         SpringApplication.run(MoneyMattersApplication.class, args);
         logger.info("MoneyMatters application started successfully!");
-        logger.info("API available at: http://localhost:8080/api");
-        logger.info("Swagger UI at: http://localhost:8080/api/swagger-ui.html");
+        logger.info("API available at: http://localhost:8082/api");
+        logger.info("Swagger UI at: http://localhost:8082/api/swagger-ui.html");
     }
 }

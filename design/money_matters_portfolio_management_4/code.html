@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Money Matters - Loan EMI Calculator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0dccf2",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101f22",
+                        "surface-dark": "#16282c",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101f22; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a3b40; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #36484d; 
+        }
+        .texture-bg {
+            background-image: radial-gradient(circle at 100% 0%, rgba(13, 204, 242, 0.08) 0%, transparent 25%), 
+                              radial-gradient(circle at 0% 100%, rgba(13, 204, 242, 0.05) 0%, transparent 25%);
+        }
+        .sidebar-pattern {
+            background-color: #101f22;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230dccf2' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }.glass {
+            background: rgba(22, 40, 44, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0dccf2;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 0 10px rgba(13, 204, 242, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #334155;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }.donut-chart {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #0dccf2 0% 70%, 
+                #3b82f6 70% 100%
+            );
+            position: relative;
+        }
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: #16282c; 
+        }
+        html:not(.dark) .donut-center {
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 antialiased h-screen overflow-hidden flex selection:bg-primary selection:text-white">
+<aside class="hidden md:flex flex-col w-64 border-r border-slate-200 dark:border-white/5 sidebar-pattern h-full relative z-20">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 rounded bg-gradient-to-br from-primary to-cyan-700 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons text-white text-lg">monetization_on</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Money Matters</span>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">pie_chart</span>
+<span class="font-medium">Portfolio</span>
+</a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">analytics</span>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center px-4 py-3 bg-primary/10 text-primary rounded-lg relative overflow-hidden" href="#">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r"></div>
+<span class="material-icons-outlined text-xl mr-3">calculate</span>
+<span class="font-medium">Calculators</span>
+</a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">newspaper</span>
+<span class="font-medium">Market News</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-white/5">
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl mr-3">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+<div class="mt-4 p-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-white/5 relative overflow-hidden">
+<div class="absolute top-0 right-0 -mt-2 -mr-2 w-12 h-12 bg-primary/20 rounded-full blur-xl"></div>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Pro Plan</p>
+<p class="text-sm font-semibold text-slate-900 dark:text-white mb-3">Upgrade for AI Insights</p>
+<button class="w-full py-2 text-xs font-semibold text-primary border border-primary/30 hover:bg-primary hover:text-white rounded transition-colors">
+                    View Plans
+                </button>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative texture-bg">
+<header class="h-20 flex items-center justify-between px-8 border-b border-slate-200 dark:border-white/5 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm z-10">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Loan EMI Calculator</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-light hidden sm:block">Analyze your loan payments and amortization schedule</p>
+</div>
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2 mr-4">
+<span class="text-sm text-slate-600 dark:text-slate-400 font-medium">Compare Loans</span>
+<button aria-checked="false" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-slate-200 dark:bg-slate-700" role="switch">
+<span aria-hidden="true" class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<button class="relative p-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+</button>
+<div class="flex items-center space-x-3 pl-6 border-l border-slate-200 dark:border-white/10">
+<div class="text-right hidden lg:block">
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Alex Morgan</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Premium Member</p>
+</div>
+<img alt="User profile portrait" class="w-10 h-10 rounded-full border-2 border-white dark:border-white/10 object-cover" data-alt="Portrait of a young woman with a neutral expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAUzKy9G6VyD-fBwSmIoP_0NVGCVnTTs72wFqPHAc_G5ImBgeCqBONL_1_3iAoNI4NBo9PQU4r9cOZA_LP2n_R6f284nERCHTu9qWlF3LRQXkLriOh_mpwC1NzuPJ2QnDQwLZa8uoVKKfFqiE_znDSYIbncs9gWHQxGI-K-5dFT-1rL6BzidHbjE9hR1arasM8dcfZ8dOSPgpzwozlbuo2WbYXYFMxlDjGSz1HzZByhyx08qyjwjJW5SO5cveTvoGXwQEGCQloqQHv"/>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 pb-24">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-5 space-y-6">
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/5 shadow-sm p-6 lg:p-8">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Loan Details</h2>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Loan Amount</label>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded px-2 py-1">
+<span class="text-xs text-slate-500 mr-1">$</span>
+<input class="bg-transparent border-none p-0 text-right text-sm font-bold text-slate-900 dark:text-white focus:ring-0 w-24" type="number" value="500000"/>
+</div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700" max="1000000" min="10000" step="5000" type="range" value="500000"/>
+<div class="flex justify-between mt-2 text-xs text-slate-400">
+<span>$10K</span>
+<span>$1M</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Interest Rate (p.a)</label>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded px-2 py-1">
+<input class="bg-transparent border-none p-0 text-right text-sm font-bold text-slate-900 dark:text-white focus:ring-0 w-16" step="0.1" type="number" value="8.5"/>
+<span class="text-xs text-slate-500 ml-1">%</span>
+</div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700" max="20" min="1" step="0.1" type="range" value="8.5"/>
+<div class="flex justify-between mt-2 text-xs text-slate-400">
+<span>1%</span>
+<span>20%</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Loan Tenure</label>
+<div class="flex space-x-2">
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded px-2 py-1">
+<input class="bg-transparent border-none p-0 text-right text-sm font-bold text-slate-900 dark:text-white focus:ring-0 w-12" type="number" value="15"/>
+<span class="text-xs text-slate-500 ml-1">Yr</span>
+</div>
+</div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700" max="30" min="1" step="1" type="range" value="15"/>
+<div class="flex justify-between mt-2 text-xs text-slate-400">
+<span>1 Yr</span>
+<span>30 Yr</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-200 dark:border-white/5 flex gap-4">
+<button class="flex-1 py-3 bg-primary hover:bg-cyan-400 text-white dark:text-slate-900 font-bold rounded-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                                Calculate
+                            </button>
+<button class="px-4 py-3 bg-white dark:bg-transparent border border-slate-200 dark:border-white/10 rounded-lg text-slate-500 hover:text-primary hover:border-primary/50 transition-colors">
+<span class="material-icons-outlined">restart_alt</span>
+</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+<div class="bg-primary rounded-xl p-8 text-white relative overflow-hidden shadow-xl shadow-primary/20 flex flex-col justify-center">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -left-12 -bottom-12 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
+<p class="text-white/80 font-medium text-sm uppercase tracking-wider mb-2 relative z-10">Monthly EMI</p>
+<h3 class="text-4xl md:text-5xl font-bold mb-6 relative z-10">$4,923<span class="text-2xl opacity-60">.70</span></h3>
+<div class="grid grid-cols-2 gap-4 relative z-10 pt-6 border-t border-white/20">
+<div>
+<p class="text-xs text-white/70 uppercase mb-1">Total Interest</p>
+<p class="text-xl font-semibold">$386,266</p>
+</div>
+<div>
+<p class="text-xs text-white/70 uppercase mb-1">Total Payment</p>
+<p class="text-xl font-semibold">$886,266</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/5 shadow-sm p-6 flex flex-col items-center justify-center">
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide w-full mb-6">Breakdown</h3>
+<div class="relative mb-6">
+<div class="donut-chart"></div>
+<div class="donut-center flex flex-col items-center justify-center">
+<span class="text-xs text-slate-400">Total</span>
+<span class="font-bold text-slate-900 dark:text-white">100%</span>
+</div>
+</div>
+<div class="w-full space-y-3">
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center">
+<div class="w-3 h-3 rounded-full bg-primary mr-2"></div>
+<span class="text-slate-600 dark:text-slate-300">Principal Loan</span>
+</div>
+<span class="font-bold text-slate-900 dark:text-white">56.4%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center">
+<div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+<span class="text-slate-600 dark:text-slate-300">Total Interest</span>
+</div>
+<span class="font-bold text-slate-900 dark:text-white">43.6%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Amortization Schedule</h3>
+<div class="flex space-x-2">
+<button class="px-3 py-1.5 text-xs font-medium border border-slate-200 dark:border-white/10 rounded hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 transition-colors">
+                            Yearly
+                        </button>
+<button class="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary border border-transparent rounded transition-colors">
+                            Monthly
+                        </button>
+<button class="ml-2 px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-primary transition-colors flex items-center">
+<span class="material-icons-outlined text-sm mr-1">download</span> Export
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-white/[0.02] border-b border-slate-200 dark:border-white/5 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+<th class="px-6 py-4 font-semibold text-center w-16">Month</th>
+<th class="px-6 py-4 font-semibold text-right">Opening Balance</th>
+<th class="px-6 py-4 font-semibold text-right">EMI</th>
+<th class="px-6 py-4 font-semibold text-right text-primary">Principal</th>
+<th class="px-6 py-4 font-semibold text-right text-blue-500">Interest</th>
+<th class="px-6 py-4 font-semibold text-right">Closing Balance</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-white/5 text-sm">
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">1</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$500,000.00</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,382.03</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,541.67</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$498,617.97</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">2</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$498,617.97</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,391.82</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,531.88</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$497,226.15</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">3</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$497,226.15</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,401.68</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,522.02</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$495,824.47</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">4</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$495,824.47</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,411.61</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,512.09</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$494,412.86</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">5</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$494,412.86</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,421.61</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,502.09</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$492,991.25</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+<td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">6</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$492,991.25</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono font-medium">$4,923.70</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$1,431.68</td>
+<td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 font-mono">$3,492.02</td>
+<td class="px-6 py-4 text-right text-slate-900 dark:text-white font-mono">$491,559.57</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-surface-dark">
+<p class="text-sm text-slate-500 dark:text-slate-400">Showing <span class="font-medium text-slate-900 dark:text-white">1-6</span> of <span class="font-medium text-slate-900 dark:text-white">180</span> months</p>
+<div class="flex space-x-2">
+<button class="p-2 border border-slate-200 dark:border-white/10 rounded-lg text-slate-300 dark:text-slate-600 cursor-not-allowed" disabled="">
+<span class="material-icons text-sm">chevron_left</span>
+</button>
+<button class="p-2 border border-slate-200 dark:border-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary hover:border-primary/50 transition-colors">
+<span class="material-icons text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIP Calculator with Step-Up | Money Matters</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0dccf2",
+                        "background-light": "#f9fafb",
+                        "background-dark": "#101f22",
+                        "surface-dark": "#16282c",
+                        "surface-light": "#ffffff",
+                        "sidebar-bg": "#1f2937",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101f22; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a3b40; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #36484d; 
+        }
+        .texture-bg {
+            background-image: radial-gradient(circle at 100% 0%, rgba(13, 204, 242, 0.05) 0%, transparent 25%), 
+                              radial-gradient(circle at 0% 100%, rgba(13, 204, 242, 0.03) 0%, transparent 25%);
+        }
+        .sidebar-pattern {
+            background-color: #1f2937;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230dccf2' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }.toggle-checkbox:checked {
+            right: 0;
+            border-color: #0dccf2;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #0dccf2;
+        }input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0dccf2;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 0 3px rgba(13, 204, 242, 0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 antialiased h-screen overflow-hidden flex selection:bg-primary selection:text-white">
+<aside class="hidden md:flex flex-col w-64 border-r border-slate-200 dark:border-white/5 sidebar-pattern h-full relative z-20 text-white">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 rounded bg-gradient-to-br from-primary to-cyan-700 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons text-white text-lg">monetization_on</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-white">Money Matters</span>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+<a class="flex items-center px-4 py-3 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-4 py-3 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">pie_chart</span>
+<span class="font-medium">Portfolio</span>
+</a>
+<div class="space-y-1">
+<button class="flex items-center w-full px-4 py-3 text-white bg-white/5 rounded-lg transition-colors group">
+<span class="material-icons-outlined text-xl mr-3 text-primary">calculate</span>
+<span class="font-medium flex-1 text-left">Calculators</span>
+<span class="material-icons text-sm text-slate-400">expand_less</span>
+</button>
+<div class="pl-11 pr-2 space-y-1 pt-1">
+<a class="flex items-center px-3 py-2 text-primary bg-primary/10 rounded-md text-sm font-medium" href="#">
+                    SIP Calculator
+                </a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors" href="#">
+                    Retirement
+                </a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors" href="#">
+                    Loan / EMI
+                </a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors" href="#">
+                    FD Calculator
+                </a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors" href="#">
+                    RD Calculator
+                </a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors" href="#">
+                    PPF Calculator
+                </a>
+</div>
+</div>
+<a class="flex items-center px-4 py-3 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-icons-outlined text-xl mr-3 group-hover:scale-110 transition-transform">newspaper</span>
+<span class="font-medium">Market News</span>
+</a>
+</nav>
+<div class="p-4 border-t border-white/10">
+<a class="flex items-center px-4 py-3 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl mr-3">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative texture-bg bg-[#f9fafb] dark:bg-background-dark">
+<header class="h-20 flex items-center justify-between px-8 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm z-10">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white">SIP Calculator</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-light hidden sm:block">Calculate wealth creation through Systematic Investment Plans</p>
+</div>
+<div class="flex items-center space-x-6">
+<button class="relative p-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+</button>
+<div class="flex items-center space-x-3 pl-6 border-l border-slate-200 dark:border-white/10">
+<div class="text-right hidden lg:block">
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Alex Morgan</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Pro Investor</p>
+</div>
+<img alt="User profile portrait" class="w-10 h-10 rounded-full border-2 border-white dark:border-white/10 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAUzKy9G6VyD-fBwSmIoP_0NVGCVnTTs72wFqPHAc_G5ImBgeCqBONL_1_3iAoNI4NBo9PQU4r9cOZA_LP2n_R6f284nERCHTu9qWlF3LRQXkLriOh_mpwC1NzuPJ2QnDQwLZa8uoVKKfFqiE_znDSYIbncs9gWHQxGI-K-5dFT-1rL6BzidHbjE9hR1arasM8dcfZ8dOSPgpzwozlbuo2WbYXYFMxlDjGSz1HzZByhyx08qyjwjJW5SO5cveTvoGXwQEGCQloqQHv"/>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 pb-24">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-5 space-y-6">
+<div class="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-200 dark:border-white/5 p-6 md:p-8">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
+<span class="material-icons-outlined text-primary mr-2">tune</span> 
+                                Input Details
+                            </h2>
+<button class="text-xs text-primary font-medium hover:underline">Reset</button>
+</div>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Monthly Investment</label>
+<div class="bg-slate-100 dark:bg-slate-800 rounded px-3 py-1 text-primary font-bold">
+                                    ₹ 25,000
+                                </div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 mb-2" max="100000" min="500" step="500" type="range" value="25000"/>
+<div class="flex justify-between text-xs text-slate-400">
+<span>₹ 500</span>
+<span>₹ 1L</span>
+</div>
+</div>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Expected Return (p.a)</label>
+<div class="bg-slate-100 dark:bg-slate-800 rounded px-3 py-1 text-primary font-bold">
+                                    12 %
+                                </div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 mb-2" max="30" min="1" step="0.5" type="range" value="12"/>
+<div class="flex justify-between text-xs text-slate-400">
+<span>1%</span>
+<span>30%</span>
+</div>
+</div>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Time Period</label>
+<div class="bg-slate-100 dark:bg-slate-800 rounded px-3 py-1 text-primary font-bold">
+                                    10 Years
+                                </div>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 mb-2" max="40" min="1" step="1" type="range" value="10"/>
+<div class="flex justify-between text-xs text-slate-400">
+<span>1 Yr</span>
+<span>40 Yr</span>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-white/5 pt-6 mt-2">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="text-sm font-medium text-slate-900 dark:text-white">Annual Step-up</h3>
+<p class="text-xs text-slate-500">Increase investment yearly</p>
+</div>
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out left-0 top-0 border-slate-300" id="stepUpToggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer" for="stepUpToggle"></label>
+</div>
+</div>
+<div class="opacity-50 pointer-events-none transition-opacity duration-200">
+<div class="flex justify-between items-center mb-2">
+<label class="text-xs font-medium text-slate-500 dark:text-slate-400">Step-up Percentage</label>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded px-2 py-0.5 text-slate-400 text-sm font-bold">
+                                        10 %
+                                    </div>
+</div>
+<input class="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-default dark:bg-slate-800" disabled="" max="50" min="0" step="1" type="range" value="10"/>
+</div>
+</div>
+<div class="mt-8 pt-4">
+<button class="w-full py-3 bg-primary hover:bg-cyan-400 text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all transform active:scale-95">
+                                Calculate Now
+                            </button>
+</div>
+</div>
+<div class="bg-blue-50 dark:bg-blue-900/10 rounded-xl p-4 border border-blue-100 dark:border-blue-900/20 flex items-start space-x-3">
+<span class="material-icons-outlined text-blue-500 mt-0.5">info</span>
+<div>
+<h4 class="text-sm font-semibold text-blue-800 dark:text-blue-300">Did you know?</h4>
+<p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Starting a SIP early can significantly benefit from the power of compounding. A delay of just 5 years could reduce your corpus by up to 40%.</p>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/5 p-6 rounded-xl shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10">
+<p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Total Invested Amount</p>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">₹ 30,00,000</h3>
+<p class="text-xs text-slate-400 mt-2">Over 10 years</p>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/5 p-6 rounded-xl shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-primary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10">
+<p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Estimated Maturity Value</p>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">₹ 58,11,987</h3>
+<p class="text-xs text-primary mt-2">Future value projected</p>
+</div>
+</div>
+<div class="md:col-span-2 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-500/20 p-6 rounded-xl shadow-sm flex items-center justify-between">
+<div>
+<p class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold mb-1 uppercase tracking-wider">Total Wealth Gain</p>
+<h3 class="text-4xl font-bold text-emerald-600 dark:text-emerald-400">₹ 28,11,987</h3>
+<div class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+<span class="material-icons text-[10px] mr-1">trending_up</span> 93.7% Absolute Returns
+                                </div>
+</div>
+<div class="hidden sm:block p-4 bg-emerald-100 dark:bg-emerald-500/20 rounded-full">
+<span class="material-icons-outlined text-3xl text-emerald-600 dark:text-emerald-400">savings</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/5 p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Growth Visualization</h3>
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<span class="w-3 h-3 rounded-full bg-slate-300 mr-2"></span>
+<span class="text-xs text-slate-500">Invested</span>
+</div>
+<div class="flex items-center">
+<span class="w-3 h-3 rounded-full bg-primary mr-2"></span>
+<span class="text-xs text-slate-500">Value</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-2 px-2 pb-4 border-b border-slate-100 dark:border-white/5 relative">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full border-t border-slate-100 dark:border-white/5 border-dashed"></div>
+<div class="w-full border-t border-slate-100 dark:border-white/5 border-dashed"></div>
+<div class="w-full border-t border-slate-100 dark:border-white/5 border-dashed"></div>
+<div class="w-full border-t border-slate-100 dark:border-white/5 border-dashed"></div>
+<div class="w-full border-t border-slate-100 dark:border-white/5 border-dashed"></div>
+</div>
+<div class="flex flex-col items-center gap-1 w-full group relative">
+<div class="w-full flex gap-1 items-end h-full justify-center">
+<div class="w-2 bg-slate-300 rounded-t-sm h-[10%] group-hover:bg-slate-400 transition-colors"></div>
+<div class="w-2 bg-primary rounded-t-sm h-[11%] group-hover:bg-cyan-400 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-400">1</span>
+<div class="absolute bottom-full mb-2 hidden group-hover:block bg-slate-800 text-white text-xs p-2 rounded z-10 whitespace-nowrap">Year 1: ₹3.4L</div>
+</div>
+<div class="flex flex-col items-center gap-1 w-full group relative">
+<div class="w-full flex gap-1 items-end h-full justify-center">
+<div class="w-2 bg-slate-300 rounded-t-sm h-[30%] group-hover:bg-slate-400 transition-colors"></div>
+<div class="w-2 bg-primary rounded-t-sm h-[38%] group-hover:bg-cyan-400 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-400">3</span>
+</div>
+<div class="flex flex-col items-center gap-1 w-full group relative">
+<div class="w-full flex gap-1 items-end h-full justify-center">
+<div class="w-2 bg-slate-300 rounded-t-sm h-[50%] group-hover:bg-slate-400 transition-colors"></div>
+<div class="w-2 bg-primary rounded-t-sm h-[65%] group-hover:bg-cyan-400 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-400">5</span>
+</div>
+<div class="flex flex-col items-center gap-1 w-full group relative">
+<div class="w-full flex gap-1 items-end h-full justify-center">
+<div class="w-2 bg-slate-300 rounded-t-sm h-[70%] group-hover:bg-slate-400 transition-colors"></div>
+<div class="w-2 bg-primary rounded-t-sm h-[85%] group-hover:bg-cyan-400 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-400">7</span>
+</div>
+<div class="flex flex-col items-center gap-1 w-full group relative">
+<div class="w-full flex gap-1 items-end h-full justify-center">
+<div class="w-2 bg-slate-300 rounded-t-sm h-[90%] group-hover:bg-slate-400 transition-colors"></div>
+<div class="w-2 bg-primary rounded-t-sm h-[100%] group-hover:bg-cyan-400 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-bold">10</span>
+<div class="absolute bottom-full mb-2 hidden group-hover:block bg-slate-800 text-white text-xs p-2 rounded z-10 whitespace-nowrap">Year 10: ₹58.1L</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/5 rounded-xl shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-white/5 flex justify-between items-center">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Year-wise Breakdown</h3>
+<button class="text-sm text-primary hover:text-cyan-600 flex items-center">
+<span class="material-icons-outlined text-sm mr-1">download</span> Export PDF
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-white/5 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+<th class="px-6 py-3 font-semibold text-center">Year</th>
+<th class="px-6 py-3 font-semibold text-right">Invested Amount</th>
+<th class="px-6 py-3 font-semibold text-right">Interest Earned</th>
+<th class="px-6 py-3 font-semibold text-right">Maturity Value</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-white/5 text-sm">
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+<td class="px-6 py-3 text-center text-slate-900 dark:text-white font-medium">1</td>
+<td class="px-6 py-3 text-right text-slate-600 dark:text-slate-300">₹ 3,00,000</td>
+<td class="px-6 py-3 text-right text-emerald-600 dark:text-emerald-400">+ ₹ 18,293</td>
+<td class="px-6 py-3 text-right text-slate-900 dark:text-white font-bold">₹ 3,18,293</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+<td class="px-6 py-3 text-center text-slate-900 dark:text-white font-medium">2</td>
+<td class="px-6 py-3 text-right text-slate-600 dark:text-slate-300">₹ 6,00,000</td>
+<td class="px-6 py-3 text-right text-emerald-600 dark:text-emerald-400">+ ₹ 58,412</td>
+<td class="px-6 py-3 text-right text-slate-900 dark:text-white font-bold">₹ 6,76,705</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+<td class="px-6 py-3 text-center text-slate-900 dark:text-white font-medium">3</td>
+<td class="px-6 py-3 text-right text-slate-600 dark:text-slate-300">₹ 9,00,000</td>
+<td class="px-6 py-3 text-right text-emerald-600 dark:text-emerald-400">+ ₹ 1,23,598</td>
+<td class="px-6 py-3 text-right text-slate-900 dark:text-white font-bold">₹ 10,80,303</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+<td class="px-6 py-3 text-center text-slate-900 dark:text-white font-medium">4</td>
+<td class="px-6 py-3 text-right text-slate-600 dark:text-slate-300">₹ 12,00,000</td>
+<td class="px-6 py-3 text-right text-emerald-600 dark:text-emerald-400">+ ₹ 2,17,452</td>
+<td class="px-6 py-3 text-right text-slate-900 dark:text-white font-bold">₹ 15,34,755</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+<td class="px-6 py-3 text-center text-slate-900 dark:text-white font-medium">5</td>
+<td class="px-6 py-3 text-right text-slate-600 dark:text-slate-300">₹ 15,00,000</td>
+<td class="px-6 py-3 text-right text-emerald-600 dark:text-emerald-400">+ ₹ 3,43,921</td>
+<td class="px-6 py-3 text-right text-slate-900 dark:text-white font-bold">₹ 20,46,473</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-3 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-200 dark:border-white/5 text-center">
+<button class="text-xs text-slate-500 hover:text-primary transition-colors font-medium uppercase tracking-wide">View Full Schedule</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
