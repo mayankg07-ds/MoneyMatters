@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
@@ -167,9 +167,16 @@ export default function CashflowPlanner() {
                                 </div>
                             </div>
 
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={calculate} disabled={loading}>
-                                {loading ? 'Projecting...' : 'Project Cashflow'}
-                            </button>
+
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading}>
+                                    {loading ? 'Projecting...' : 'Project Cashflow'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setIncomes([{ name: 'Salary', monthlyAmount: 80000, category: 'Fixed' }]); setExpenses([{ name: 'Rent', monthlyAmount: 25000, category: 'Fixed' }]); setProjectionYears(10); setIncomeGrowth(5); setExpenseGrowth(7); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 

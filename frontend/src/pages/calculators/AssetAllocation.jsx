@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -146,9 +146,16 @@ export default function AssetAllocation() {
                                 <input className="input-field" type="number" value={freshInvestment} onChange={e => setFreshInvestment(e.target.value)} />
                             </div>
 
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={calculate} disabled={loading || totalTarget !== 100}>
-                                {loading ? 'Calculating...' : 'Rebalance Portfolio'}
-                            </button>
+
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading || totalTarget !== 100}>
+                                    {loading ? 'Calculating...' : 'Rebalance Portfolio'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setHoldings(DEFAULT_ASSETS.map(a => ({ assetName: a, currentValue: '', currentPercentage: 0 }))); setTargets(DEFAULT_ASSETS.map(a => ({ assetName: a, targetPercentage: 25 }))); setFreshInvestment(''); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 

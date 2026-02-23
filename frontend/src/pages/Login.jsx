@@ -1,30 +1,66 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ShieldCheck, KeyRound } from 'lucide-react';
+import { useToast } from '../components/Toast';
+import GradientText from '../components/GradientText';
 
 export default function Login() {
     const navigate = useNavigate();
+    const toast = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        localStorage.setItem('userId', '1');
-        localStorage.setItem('userName', 'Alex Morgan');
-        navigate('/dashboard');
+        const errs = {};
+        if (!email.trim()) errs.email = 'Email is required';
+        if (!password) errs.password = 'Password is required';
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) return;
+
+        setLoading(true);
+        setTimeout(() => {
+            localStorage.setItem('userId', '1');
+            localStorage.setItem('userName', 'Alex Morgan');
+            toast.success('Welcome back!');
+            navigate('/dashboard');
+        }, 600);
     };
 
     return (
-        <div className="login-page">
+        <div className="login-page" style={{ backgroundImage: 'url("/src/assets/WolfofWallStreet.png")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="login-overlay"></div>
             <div className="login-logo">
-                <div className="logo-icon">M</div>
-                <h1>MoneyMatters</h1>
+                <GradientText
+                    colors={["#0676bc", "#003cc7", "#bdc2d0"]}
+                    animationSpeed={2}
+                    showBorder={true}
+                    className="login-brand-text"
+                >
+                    Money Matters
+                </GradientText>
                 <p>Smart wealth management</p>
             </div>
 
             <div className="login-card">
                 <h2>Sign in to your account</h2>
                 <p className="subtitle">Enter your details below to access your dashboard.</p>
+
+                {/* Trial Credentials Hint */}
+                <div
+                    className="trial-hint"
+                    onClick={() => { setEmail('demo@moneymatters.com'); setPassword('demo123'); }}
+                    title="Click to auto-fill"
+                >
+                    <div className="hint-title">🚀 Trial Access</div>
+                    <div className="hint-code">
+                        <span>Email: demo@moneymatters.com</span>
+                        <span>Pass: demo123</span>
+                    </div>
+                    <div className="hint-sub">(Click to auto-fill)</div>
+                </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
@@ -34,12 +70,13 @@ export default function Login() {
                             <input
                                 id="login-email"
                                 type="email"
-                                className="input-field"
+                                className={`input-field ${errors.email ? 'input-error' : ''}`}
                                 placeholder="name@company.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
+                        {errors.email && <span className="field-error">{errors.email}</span>}
                     </div>
 
                     <div className="input-group">
@@ -52,12 +89,13 @@ export default function Login() {
                             <input
                                 id="login-password"
                                 type="password"
-                                className="input-field"
+                                className={`input-field ${errors.password ? 'input-error' : ''}`}
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
+                        {errors.password && <span className="field-error">{errors.password}</span>}
                     </div>
 
                     <div className="remember-row">
@@ -65,7 +103,9 @@ export default function Login() {
                         <label htmlFor="remember-me">Keep me logged in</label>
                     </div>
 
-                    <button type="submit" className="btn-login" id="sign-in-btn">Sign In</button>
+                    <button type="submit" className="btn-login" id="sign-in-btn" disabled={loading}>
+                        {loading ? 'Signing In...' : 'Sign In'}
+                    </button>
                 </form>
 
                 <div className="divider">or continue with</div>
@@ -83,7 +123,7 @@ export default function Login() {
             </div>
 
             <div className="login-footer">
-                <p>New to MoneyMatters? <a href="#">Create an account</a></p>
+                <p>New to MoneyMatters? <Link to="/register">Create an account</Link></p>
             </div>
 
             <div className="login-trust">

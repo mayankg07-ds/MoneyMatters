@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -75,9 +75,14 @@ export default function LoanCalculator() {
                                     <div className="slider-range"><span>{s.pre ? fmt(s.min) : s.min + s.sfx}</span><span>{s.pre ? fmt(s.max) : s.max + s.sfx}</span></div>
                                 </div>
                             ))}
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={calculate} disabled={loading}>
-                                {loading ? 'Analyzing...' : 'Analyze Loan'}
-                            </button>
+                            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading}>
+                                    {loading ? 'Analyzing...' : 'Analyze Loan'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setAmount(5000000); setRate(8.5); setTenure(20); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 

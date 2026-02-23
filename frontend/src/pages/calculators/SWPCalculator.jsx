@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Line, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Filler, Tooltip, Legend } from 'chart.js';
@@ -151,9 +151,16 @@ export default function SWPCalculator() {
                                 </div>
                             )}
 
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={calculate} disabled={loading}>
-                                {loading ? 'Calculating...' : 'Calculate SWP'}
-                            </button>
+
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading}>
+                                    {loading ? 'Calculating...' : 'Calculate SWP'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setCorpus(5000000); setWithdrawal(25000); setRate(9); setDuration(20); setInflation(6); setInflationAdj(false); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 

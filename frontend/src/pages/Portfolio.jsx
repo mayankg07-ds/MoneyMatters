@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import {
     Building2, TrendingUp, Wallet, ArrowUpRight,
     Search, Plus, RefreshCw, MoreVertical,
-    Edit2, Trash2, X,
+    Edit2, Trash2, X, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import Header from '../components/Header';
 import { holdingsApi } from '../services/api';
+import { useToast } from '../components/Toast';
 
 const formatCurrency = (v) => {
     if (v == null) return '₹0';
@@ -24,6 +25,9 @@ export default function Portfolio() {
     const [currentPage, setCurrentPage] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [editingHolding, setEditingHolding] = useState(null);
+    const [sortKey, setSortKey] = useState(null);
+    const [sortDir, setSortDir] = useState('asc');
+    const toast = useToast();
     const [form, setForm] = useState({
         userId: 1, assetType: 'STOCK', assetName: '', assetSymbol: '',
         exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '',
@@ -53,11 +57,31 @@ export default function Portfolio() {
         return matchSearch && matchType;
     });
 
-    const totalPages = Math.ceil(filtered.length / perPage);
-    const paged = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
+    const sorted = [...filtered].sort((a, b) => {
+        if (!sortKey) return 0;
+        let va = a[sortKey], vb = b[sortKey];
+        if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const totalPages = Math.ceil(sorted.length / perPage);
+    const paged = sorted.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+    const toggleSort = (key) => {
+        if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+        else { setSortKey(key); setSortDir('asc'); }
+    };
+
+    const SortIcon = ({ col }) => (
+        <span className={`sort-icon ${sortKey === col ? 'active' : ''}`}>
+            {sortKey === col ? (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : '⇅'}
+        </span>
+    );
 
     const handleRefreshAll = async () => {
-        try { await holdingsApi.refreshAll(userId); loadData(); } catch (e) { console.error(e); }
+        try { await holdingsApi.refreshAll(userId); loadData(); toast.success('Prices refreshed'); } catch (e) { console.error(e); toast.error('Failed to refresh prices'); }
     };
 
     const openAdd = () => {
@@ -86,13 +110,14 @@ export default function Portfolio() {
                 await holdingsApi.create(payload);
             }
             setShowModal(false);
+            toast.success(editingHolding ? 'Holding updated!' : 'Holding added!');
             loadData();
-        } catch (e) { console.error(e); alert('Error saving holding'); }
+        } catch (e) { console.error(e); toast.error('Error saving holding'); }
     };
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this holding?')) return;
-        try { await holdingsApi.delete(id); loadData(); } catch (e) { console.error(e); }
+        try { await holdingsApi.delete(id); toast.success('Holding deleted'); loadData(); } catch (e) { console.error(e); toast.error('Failed to delete'); }
     };
 
     const totalInvested = summary?.totalInvested || 0;
@@ -176,12 +201,12 @@ export default function Portfolio() {
                                 <table className="data-table" id="holdings-table">
                                     <thead>
                                         <tr>
-                                            <th>Symbol / Name</th>
-                                            <th>Quantity</th>
-                                            <th>Avg Buy Price</th>
-                                            <th>Current Price</th>
-                                            <th>Current Value</th>
-                                            <th>Total Gain/Loss</th>
+                                            <th className="sortable-header" onClick={() => toggleSort('assetSymbol')}>Symbol / Name <SortIcon col="assetSymbol" /></th>
+                                            <th className="sortable-header" onClick={() => toggleSort('quantity')}>Quantity <SortIcon col="quantity" /></th>
+                                            <th className="sortable-header" onClick={() => toggleSort('avgBuyPrice')}>Avg Buy Price <SortIcon col="avgBuyPrice" /></th>
+                                            <th className="sortable-header" onClick={() => toggleSort('currentPrice')}>Current Price <SortIcon col="currentPrice" /></th>
+                                            <th className="sortable-header" onClick={() => toggleSort('currentValue')}>Current Value <SortIcon col="currentValue" /></th>
+                                            <th className="sortable-header" onClick={() => toggleSort('unrealizedGain')}>Total Gain/Loss <SortIcon col="unrealizedGain" /></th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>

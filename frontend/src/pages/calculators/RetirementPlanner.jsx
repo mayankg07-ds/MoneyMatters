@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
@@ -73,9 +73,16 @@ export default function RetirementPlanner() {
                                     <div className="slider-range"><span>{s.pre ? fmt(s.min) : s.min + s.sfx}</span><span>{s.pre ? fmt(s.max) : s.max + s.sfx}</span></div>
                                 </div>
                             ))}
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={calculate} disabled={loading}>
-                                {loading ? 'Planning...' : 'Plan Retirement'}
-                            </button>
+
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading}>
+                                    {loading ? 'Planning...' : 'Plan Retirement'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setAge(30); setRetireAge(60); setLifeExp(85); setMonthlyExp(50000); setInflation(6); setPreRoi(12); setPostRoi(8); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 

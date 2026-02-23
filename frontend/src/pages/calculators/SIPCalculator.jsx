@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip } from 'chart.js';
@@ -76,9 +76,14 @@ export default function SIPCalculator() {
                                     <div className="slider-range"><span>{s.fmt === '₹' ? fmt(s.min) : s.min + s.fmt}</span><span>{s.fmt === '₹' ? fmt(s.max) : s.max + s.fmt}</span></div>
                                 </div>
                             ))}
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={calculate} disabled={loading}>
-                                {loading ? 'Calculating...' : 'Calculate Returns'}
-                            </button>
+                            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={calculate} disabled={loading}>
+                                    {loading ? 'Calculating...' : 'Calculate Returns'}
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => { setMonthly(10000); setRate(12); setYears(10); setStepup(10); setResult(null); }}>
+                                    <RotateCcw size={14} /> Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
 
