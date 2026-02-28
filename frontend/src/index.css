@@ -2,21 +2,22 @@
 
 :root {
   /* Background Colors */
-  --bg-primary: #0a1929;
-  --bg-secondary: #0d2137;
-  --bg-card: #0f2744;
-  --bg-card-hover: #132d4a;
-  --bg-surface: #112240;
-  --bg-input: #0b1d33;
-  --bg-sidebar: #0c1e35;
-  --bg-modal-overlay: rgba(0, 0, 0, 0.6);
+  --bg-primary: #060910;
+  --bg-secondary: #0d1421;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.05);
+  --bg-surface: #0a111c;
+  --bg-input: #080d15;
+  --bg-sidebar: #060910;
+  --bg-modal-overlay: rgba(6, 9, 16, 0.85);
 
   /* Accent Colors */
-  --accent-primary: #00e5a0;
-  --accent-secondary: #00bcd4;
-  --accent-gradient: linear-gradient(135deg, #00e5a0, #00bcd4);
-  --accent-glow: rgba(0, 229, 160, 0.15);
-  --accent-cyan: #00bcd4;
+  --accent-primary: #10b981;
+  --accent-secondary: #f0b429;
+  --accent-gradient: linear-gradient(135deg, #10b981, #f0b429);
+  --accent-glow: rgba(16, 185, 129, 0.15);
+  --accent-cyan: #10b981;
+  /* Migrating cyan uses to emerald */
 
   /* Text Colors */
   --text-primary: #e8edf3;
@@ -26,24 +27,24 @@
   --text-accent: #00e5a0;
 
   /* Status Colors */
-  --color-success: #00e5a0;
-  --color-danger: #ff4c6a;
-  --color-warning: #ffb347;
-  --color-info: #00bcd4;
-  --color-buy: #00e5a0;
-  --color-sell: #ff4c6a;
-  --color-dividend: #00bcd4;
-  --color-sip: #7c4dff;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f0b429;
+  --color-info: #3b82f6;
+  --color-buy: #10b981;
+  --color-sell: #ef4444;
+  --color-dividend: #3b82f6;
+  --color-sip: #8b5cf6;
 
   /* Border Colors */
-  --border-color: rgba(255, 255, 255, 0.06);
-  --border-active: #00e5a0;
-  --border-subtle: rgba(255, 255, 255, 0.03);
+  --border-color: rgba(255, 255, 255, 0.07);
+  --border-active: #10b981;
+  --border-subtle: rgba(255, 255, 255, 0.04);
 
   /* Shadows */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
-  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(0, 229, 160, 0.1);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.15);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 
   /* Sizing */
   --sidebar-width: 240px;
@@ -58,12 +59,16 @@
   --transition-slow: 400ms ease;
 
   /* Chart Colors */
-  --chart-1: #00e5a0;
-  --chart-2: #00bcd4;
-  --chart-3: #7c4dff;
-  --chart-4: #ffb347;
-  --chart-5: #ff4c6a;
-  --chart-6: #36a2eb;
+  --chart-1: #10b981;
+  --chart-2: #3b82f6;
+  --chart-3: #8b5cf6;
+  --chart-4: #f0b429;
+  --chart-5: #ef4444;
+  --chart-6: #14b8a6;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
 }
 
 *,
@@ -168,15 +173,17 @@ textarea {
 /* ===== CARDS ===== */
 .card {
   background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
   padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
   transition: all var(--transition-normal);
 }
 
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: var(--shadow-card);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .card-header {
@@ -201,51 +208,53 @@ textarea {
 
 .stat-card {
   background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 20px 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
-  transition: all var(--transition-normal);
 }
 
 .stat-card:hover {
+  border-color: rgba(16, 185, 129, 0.2);
   transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
-  border-color: rgba(0, 229, 160, 0.2);
 }
 
-.stat-card .stat-header {
+.stat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
 
-.stat-card .stat-label {
-  font-size: 0.78rem;
+.stat-label {
+  font-size: 0.85rem;
   font-weight: 500;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-secondary);
 }
 
-.stat-card .stat-icon {
+.stat-icon {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
 }
 
-.stat-card .stat-value {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.75rem;
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.8rem;
   font-weight: 700;
-  color: var(--text-heading);
+  color: var(--text-primary);
   margin-bottom: 4px;
+  letter-spacing: -0.5px;
 }
 
 .stat-card .stat-sub {
@@ -359,21 +368,26 @@ textarea {
 
 .data-table thead th {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.7px;
+  letter-spacing: 1px;
   color: var(--text-muted);
   padding: 14px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  /* Softer border */
   white-space: nowrap;
 }
 
 .data-table tbody td {
-  padding: 16px;
-  font-size: 0.9rem;
+  padding: 14px 16px;
+  /* Slightly tighter rows */
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  /* Use mono for data rows */
   color: var(--text-primary);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  /* Dashed subtle border */
   vertical-align: middle;
 }
 

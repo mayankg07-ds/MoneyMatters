@@ -54,15 +54,11 @@ export default function Sidebar() {
 
             <aside className={`sidebar ${mobileOpen ? 'sidebar-open' : ''}`}>
                 <div className="sidebar-brand">
-                    <NavLink to="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', textDecoration: 'none' }} onClick={closeMobile}>
-                        <GradientText
-                            colors={["#0676bc", "#003cc7", "#bdc2d0"]}
-                            animationSpeed={2}
-                            showBorder={true}
-                            className="sidebar-brand-text"
-                        >
-                            Money Matters
-                        </GradientText>
+                    <NavLink to="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', textDecoration: 'none', gap: '8px' }} onClick={closeMobile}>
+                        <span style={{ color: '#10b981', fontSize: '24px', lineHeight: 1 }}>◈</span>
+                        <span className="font-display" style={{ fontWeight: 700, fontSize: '20px', color: '#fff', letterSpacing: '0.5px' }}>
+                            MoneyMatters
+                        </span>
                     </NavLink>
                 </div>
 

@@ -73,8 +73,8 @@ export default function Dashboard() {
                 totalInvested * 0.98, currentValue * 0.97, currentValue,
             ],
             fill: true,
-            borderColor: '#00e5a0',
-            backgroundColor: 'rgba(0, 229, 160, 0.08)',
+            borderColor: '#10b981', // New Emerald
+            backgroundColor: 'rgba(16, 185, 129, 0.08)',
             tension: 0.4,
             pointRadius: 0,
             borderWidth: 2,
@@ -136,7 +136,7 @@ export default function Dashboard() {
                     <div className="stat-card">
                         <div className="stat-header">
                             <span className="stat-label">Current Value</span>
-                            <div className="stat-icon" style={{ background: 'rgba(0,229,160,0.12)', color: '#00e5a0' }}>
+                            <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
                                 <TrendingUp size={18} />
                             </div>
                         </div>
@@ -149,11 +149,11 @@ export default function Dashboard() {
                     <div className="stat-card">
                         <div className="stat-header">
                             <span className="stat-label">Total Gain</span>
-                            <div className="stat-icon" style={{ background: totalGain >= 0 ? 'rgba(0,229,160,0.12)' : 'rgba(255,76,106,0.12)', color: totalGain >= 0 ? '#00e5a0' : '#ff4c6a' }}>
+                            <div className="stat-icon" style={{ background: totalGain >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)', color: totalGain >= 0 ? '#10b981' : '#ef4444' }}>
                                 <ArrowUpRight size={18} />
                             </div>
                         </div>
-                        <div className="stat-value" style={{ color: totalGain >= 0 ? '#00e5a0' : '#ff4c6a' }}>
+                        <div className="stat-value" style={{ color: totalGain >= 0 ? '#10b981' : '#ef4444' }}>
                             {totalGain >= 0 ? '+' : ''}{formatCurrency(totalGain)}
                         </div>
                         <div className="stat-sub">Absolute Returns: {formatPercent(gainPercent)}</div>
@@ -162,7 +162,7 @@ export default function Dashboard() {
                     <div className="stat-card">
                         <div className="stat-header">
                             <span className="stat-label">XIRR Rate</span>
-                            <div className="stat-icon" style={{ background: 'rgba(124,77,255,0.12)', color: '#7c4dff' }}>
+                            <div className="stat-icon" style={{ background: 'rgba(240,180,41,0.12)', color: '#f0b429' }}> {/* Gold */}
                                 <Percent size={18} />
                             </div>
                         </div>
@@ -256,13 +256,13 @@ export default function Dashboard() {
                                             <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
                                                 {new Date(tx.transactionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                             </td>
-                                            <td>{tx.assetName || tx.assetSymbol}</td>
+                                            <td className="font-mono">{tx.assetName || tx.assetSymbol}</td>
                                             <td>
-                                                <span className={`badge badge-${tx.transactionType?.toLowerCase()}`}>
+                                                <span className={`badge badge-${tx.transactionType?.toLowerCase()}`} style={{ background: 'transparent', border: `1px solid var(--color-${tx.transactionType?.toLowerCase()})` }}>
                                                     {tx.transactionType}
                                                 </span>
                                             </td>
-                                            <td style={{ fontWeight: 600 }}>{formatCurrency(tx.totalAmount)}</td>
+                                            <td className="font-mono" style={{ fontWeight: 600 }}>{formatCurrency(tx.totalAmount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -272,12 +272,15 @@ export default function Dashboard() {
                 </div>
 
                 {/* Promo Banner */}
-                <div className="promo-banner">
+                <div className="promo-banner" style={{
+                    background: 'radial-gradient(circle at right, rgba(240,180,41,0.1), var(--bg-card))',
+                    border: '1px solid rgba(240,180,41,0.2)'
+                }}>
                     <div>
-                        <h3>Optimize your portfolio</h3>
-                        <p>Our AI-driven analysis suggests you could save ₹1,200 in fees.</p>
+                        <h3 style={{ color: '#fff' }}>Optimize your portfolio</h3>
+                        <p style={{ color: 'var(--text-secondary)' }}>Our AI-driven analysis suggests you could save ₹1,200 in fees.</p>
                     </div>
-                    <button className="btn">Start Optimization</button>
+                    <button className="btn" style={{ background: 'rgba(240,180,41,0.1)', color: '#f0b429', border: '1px solid rgba(240,180,41,0.3)' }}>Start Optimization</button>
                 </div>
             </div>
         </>

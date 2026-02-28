@@ -1,18 +1,35 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, ShieldCheck, KeyRound } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Mail, Lock, X } from 'lucide-react';
 import { useToast } from '../components/Toast';
-import GradientText from '../components/GradientText';
+
+import LandingNavbar from '../components/landing/LandingNavbar';
+import LandingHero from '../components/landing/LandingHero';
+import LandingTicker from '../components/landing/LandingTicker';
+import LandingCalculators from '../components/landing/LandingCalculators';
+import LandingPortfolio from '../components/landing/LandingPortfolio';
+import LandingHowItWorks from '../components/landing/LandingHowItWorks';
+import LandingStatsBar from '../components/landing/LandingStatsBar';
+import LandingFinalCTA from '../components/landing/LandingFinalCTA';
+import LandingFooter from '../components/landing/LandingFooter';
+
+import './Landing.css';
 
 export default function Login() {
     const navigate = useNavigate();
     const toast = useToast();
+
+    // Login Form State
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    // Dialog State
+    const [open, setOpen] = useState(false);
+
+    const handleLoginSubmit = (e) => {
         e.preventDefault();
         const errs = {};
         if (!email.trim()) errs.email = 'Email is required';
@@ -25,123 +42,160 @@ export default function Login() {
             localStorage.setItem('userId', '1');
             localStorage.setItem('userName', 'Alex Morgan');
             toast.success('Welcome back!');
+            setLoading(false);
+            setOpen(false);
             navigate('/dashboard');
         }, 600);
     };
 
     return (
-        <div className="login-page" style={{ backgroundImage: 'url("/src/assets/WolfofWallStreet.png")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="login-overlay"></div>
-            <div className="login-logo">
-                <GradientText
-                    colors={["#0676bc", "#003cc7", "#bdc2d0"]}
-                    animationSpeed={2}
-                    showBorder={true}
-                    className="login-brand-text"
-                >
-                    Money Matters
-                </GradientText>
-                <p>Smart wealth management</p>
-            </div>
+        <div className="landing-page-wrapper">
+            <LandingNavbar onSignInClick={() => setOpen(true)} />
 
-            <div className="login-card">
-                <h2>Sign in to your account</h2>
-                <p className="subtitle">Enter your details below to access your dashboard.</p>
+            <main>
+                <LandingHero />
+                <LandingTicker />
+                <LandingCalculators />
+                <LandingPortfolio />
+                <LandingHowItWorks />
+                <LandingStatsBar />
+                <LandingFinalCTA />
+            </main>
 
-                {/* Trial Credentials Hint */}
-                <div
-                    className="trial-hint"
-                    onClick={() => { setEmail('demo@moneymatters.com'); setPassword('demo123'); }}
-                    title="Click to auto-fill"
-                >
-                    <div className="hint-title">🚀 Trial Access</div>
-                    <div className="hint-code">
-                        <span>Email: demo@moneymatters.com</span>
-                        <span>Pass: demo123</span>
-                    </div>
-                    <div className="hint-sub">(Click to auto-fill)</div>
-                </div>
+            <LandingFooter />
 
-                <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <label>Email Address</label>
-                        <div className="input-with-icon">
-                            <Mail size={16} className="icon" />
-                            <input
-                                id="login-email"
-                                type="email"
-                                className={`input-field ${errors.email ? 'input-error' : ''}`}
-                                placeholder="name@company.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+            {/* --- RADIX UI LOGIN DIALOG --- */}
+            <Dialog.Root open={open} onOpenChange={setOpen}>
+                <Dialog.Portal>
+                    <Dialog.Overlay style={{
+                        background: 'rgba(6, 9, 16, 0.9)',
+                        backdropFilter: 'blur(8px)',
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 999,
+                    }} />
+                    <Dialog.Content style={{
+                        background: 'var(--land-bg-secondary)',
+                        border: '1px solid var(--land-border-subtle)',
+                        borderRadius: '20px',
+                        boxShadow: 'var(--land-shadow-card)',
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '90vw',
+                        maxWidth: '440px',
+                        padding: '40px',
+                        zIndex: 1000,
+                        color: '#f0f4f8'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <Dialog.Title className="font-display" style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
+                                Sign in to your account
+                            </Dialog.Title>
+                            <Dialog.Close asChild>
+                                <button style={{ background: 'transparent', border: 'none', color: 'var(--land-text-secondary)', cursor: 'pointer' }}>
+                                    <X size={20} />
+                                </button>
+                            </Dialog.Close>
                         </div>
-                        {errors.email && <span className="field-error">{errors.email}</span>}
-                    </div>
+                        <Dialog.Description style={{ color: 'var(--land-text-secondary)', fontSize: '14px', marginBottom: '32px' }}>
+                            Enter your details below to access your dashboard.
+                        </Dialog.Description>
 
-                    <div className="input-group">
-                        <div className="password-row">
-                            <label>Password</label>
-                            <a href="#" className="forgot-link">Forgot password?</a>
+                        {/* Trial Hint */}
+                        <div
+                            onClick={() => { setEmail('demo@moneymatters.com'); setPassword('demo123'); }}
+                            style={{
+                                background: 'rgba(16,185,129,0.05)',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                                borderRadius: '12px',
+                                padding: '16px',
+                                cursor: 'pointer',
+                                marginBottom: '24px',
+                                transition: 'background 0.2s',
+                                fontSize: '13px'
+                            }}
+                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.1)'}
+                            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.05)'}
+                        >
+                            <div style={{ color: 'var(--land-accent-green)', fontWeight: 600, marginBottom: '8px' }}>🚀 Trial Access</div>
+                            <div className="font-mono" style={{ color: '#fff', fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Email: demo@moneymatters.com</div>
+                            <div className="font-mono" style={{ color: '#fff', fontSize: '12px', opacity: 0.8 }}>Pass: demo123</div>
+                            <div style={{ color: 'var(--land-text-secondary)', fontSize: '11px', marginTop: '8px' }}>(Click to auto-fill)</div>
                         </div>
-                        <div className="input-with-icon">
-                            <Lock size={16} className="icon" />
-                            <input
-                                id="login-password"
-                                type="password"
-                                className={`input-field ${errors.password ? 'input-error' : ''}`}
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                        {errors.password && <span className="field-error">{errors.password}</span>}
-                    </div>
 
-                    <div className="remember-row">
-                        <input type="checkbox" id="remember-me" />
-                        <label htmlFor="remember-me">Keep me logged in</label>
-                    </div>
+                        <form onSubmit={handleLoginSubmit}>
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, marginBottom: '8px', color: 'var(--land-text-secondary)' }}>Email Address</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Mail size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--land-text-secondary)' }} />
+                                    <input
+                                        type="email"
+                                        placeholder="name@company.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            border: `1px solid ${errors.email ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+                                            borderRadius: '8px',
+                                            padding: '12px 16px 12px 44px',
+                                            color: '#fff',
+                                            fontSize: '15px',
+                                            outline: 'none',
+                                            transition: 'border-color 0.2s'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = 'var(--land-accent-green)'}
+                                        onBlur={(e) => e.target.style.borderColor = errors.email ? '#ef4444' : 'rgba(255,255,255,0.1)'}
+                                    />
+                                </div>
+                                {errors.email && <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '6px' }}>{errors.email}</div>}
+                            </div>
 
-                    <button type="submit" className="btn-login" id="sign-in-btn" disabled={loading}>
-                        {loading ? 'Signing In...' : 'Sign In'}
-                    </button>
-                </form>
+                            <div style={{ marginBottom: '32px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                    <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--land-text-secondary)' }}>Password</label>
+                                    <a href="#" style={{ fontSize: '13px', color: 'var(--land-accent-green)', textDecoration: 'none' }}>Forgot password?</a>
+                                </div>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--land-text-secondary)' }} />
+                                    <input
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            border: `1px solid ${errors.password ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+                                            borderRadius: '8px',
+                                            padding: '12px 16px 12px 44px',
+                                            color: '#fff',
+                                            fontSize: '15px',
+                                            outline: 'none',
+                                            transition: 'border-color 0.2s'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = 'var(--land-accent-green)'}
+                                        onBlur={(e) => e.target.style.borderColor = errors.password ? '#ef4444' : 'rgba(255,255,255,0.1)'}
+                                    />
+                                </div>
+                                {errors.password && <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '6px' }}>{errors.password}</div>}
+                            </div>
 
-                <div className="divider">or continue with</div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="land-btn land-btn-primary"
+                                style={{ width: '100%', height: '48px', fontSize: '16px', display: 'flex', justifyContent: 'center' }}
+                            >
+                                {loading ? 'Signing In...' : 'Sign In'}
+                            </button>
+                        </form>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
 
-                <div className="social-buttons">
-                    <button className="social-btn" id="google-login">
-                        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                        Google
-                    </button>
-                    <button className="social-btn" id="apple-login">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#333"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" /></svg>
-                        Apple
-                    </button>
-                </div>
-            </div>
-
-            <div className="login-footer">
-                <p>New to MoneyMatters? <Link to="/register">Create an account</Link></p>
-            </div>
-
-            <div className="login-trust">
-                <div className="badge-item">
-                    <ShieldCheck size={14} />
-                    Bank-Level Security
-                </div>
-                <div className="badge-item">
-                    <KeyRound size={14} />
-                    256-Bit AES Encryption
-                </div>
-            </div>
-
-            <div className="login-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Contact Us</a>
-            </div>
         </div>
     );
 }

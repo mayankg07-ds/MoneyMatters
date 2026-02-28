@@ -1,0 +1,136 @@
+/* 
+ * ==========================================
+ * MONEYMATTERS — PREMIUM LANDING PAGE STYLES
+ * ==========================================
+ */
+
+:root {
+    /* Landing Specific Colors */
+    --land-bg-primary: #060910;
+    --land-bg-secondary: #0d1421;
+    --land-bg-card: rgba(255, 255, 255, 0.03);
+    --land-border-subtle: rgba(255, 255, 255, 0.07);
+    --land-border-glow: rgba(16, 185, 129, 0.3);
+
+    --land-accent-green: #10b981;
+    --land-accent-green-glow: rgba(16, 185, 129, 0.188);
+    --land-accent-gold: #f0b429;
+    --land-accent-gold-dim: rgba(240, 180, 41, 0.125);
+
+    --land-text-primary: #f0f4f8;
+    --land-text-secondary: #8899aa;
+    --land-text-muted: #4a5568;
+    --land-text-green: #10b981;
+
+    /* Landing Typography */
+    --font-display: 'Clash Display', 'Cal Sans', 'Syne', 'Outfit', sans-serif;
+    --font-body: 'Inter', 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+
+    /* Landing Effects */
+    --land-shadow-green: 0 0 40px rgba(16, 185, 129, 0.15);
+    --land-shadow-card: 0 25px 50px rgba(0, 0, 0, 0.5);
+    --land-blur-glass: blur(16px) saturate(180%);
+
+    /* Layout Spacing */
+    --section-pad-lg: 120px 0;
+    --section-pad-md: 80px 0;
+    --section-pad-sm: 40px 0;
+
+    --land-container: 1280px;
+    --land-container-pad: 0 40px;
+}
+
+/* Global Reset for Landing Container */
+.landing-page-wrapper {
+    background-color: var(--land-bg-primary);
+    color: var(--land-text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.landing-container {
+    max-width: var(--land-container);
+    margin: 0 auto;
+    padding: var(--land-container-pad);
+    width: 100%;
+}
+
+/* Typography Helpers */
+.font-display {
+    font-family: var(--font-display);
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+.text-green {
+    color: var(--land-text-green);
+}
+
+.text-gold {
+    color: var(--land-accent-gold);
+}
+
+/* Buttons */
+.land-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.land-btn-primary {
+    background-color: var(--land-accent-green);
+    color: #fff;
+    border: none;
+}
+
+.land-btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--land-shadow-green);
+}
+
+.land-btn-ghost {
+    background-color: transparent;
+    color: var(--land-text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.land-btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--land-text-primary);
+}
+
+/* Animations */
+@keyframes shimmer {
+    0% {
+        background-position: 200% center;
+    }
+
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.shimmer-text {
+    background: linear-gradient(90deg, #10b981, #f0b429, #10b981);
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Section Specific Overrides */
+/* Extracted to be modular per component via inline or dedicated CSS files if needed, but keeping global classes here */

@@ -1,0 +1,36 @@
+.ticker-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.ticker-track {
+    display: inline-flex;
+    whiteSpace: nowrap;
+    animation: ticker 30s linear infinite;
+    font-size: 13px;
+    color: var(--land-accent-green);
+    letter-spacing: 0.05em;
+    will-change: transform;
+}
+
+.ticker-wrapper:hover .ticker-track {
+    animation-play-state: paused;
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+@keyframes ticker {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(-33.3333%, 0, 0);
+    }
+
+    /* Matches 3 duplicates */
+}
