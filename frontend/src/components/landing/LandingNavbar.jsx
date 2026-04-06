@@ -5,7 +5,7 @@ import GradientText from '../GradientText';
 import '../Sidebar.css'; // Just for the brand icon fallback if needed
 import '../../pages/Landing.css';
 
-export default function LandingNavbar({ onSignInClick }) {
+export default function LandingNavbar({ clerkSignInSlot }) {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -68,19 +68,15 @@ export default function LandingNavbar({ onSignInClick }) {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, justifyContent: 'flex-end' }}>
-                <button
-                    onClick={onSignInClick}
-                    className="land-btn land-btn-ghost"
-                    style={{ height: '40px', padding: '0 20px', fontSize: '14px' }}
-                >
-                    Sign In
-                </button>
-                <button
-                    className="land-btn land-btn-primary"
-                    style={{ height: '40px', padding: '0 20px', fontSize: '14px', display: 'flex', gap: '6px' }}
-                >
-                    Get Started <ArrowRight size={16} />
-                </button>
+                {/* Clerk-powered auth slot — renders SignInButton or UserButton */}
+                {clerkSignInSlot ?? (
+                    <button
+                        className="land-btn land-btn-primary"
+                        style={{ height: '40px', padding: '0 20px', fontSize: '14px', display: 'flex', gap: '6px' }}
+                    >
+                        Get Started <ArrowRight size={16} />
+                    </button>
+                )}
             </div>
         </motion.nav>
     );

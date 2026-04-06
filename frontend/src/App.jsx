@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@clerk/react';
 import { ToastProvider } from './components/Toast';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Portfolio from './pages/Portfolio';
 import Analytics from './pages/Analytics';
@@ -20,14 +20,15 @@ import PPFCalculator from './pages/calculators/PPFCalculator';
 import Settings from './pages/Settings';
 
 function ProtectedRoute({ children }) {
-  const userId = localStorage.getItem('userId');
-  if (!userId) return <Navigate to="/login" replace />;
+  const { isSignedIn, isLoaded } = useAuth();
+  if (!isLoaded) return null; // wait for Clerk to hydrate
+  if (!isSignedIn) return <Navigate to="/login" replace />;
   return children;
 }
 
 function AppLayout() {
   const location = useLocation();
-  if (location.pathname === '/login' || location.pathname === '/register') return null;
+  if (location.pathname === '/login') return null;
 
   return (
     <div className="app-layout">
@@ -62,7 +63,6 @@ export default function App() {
       <ToastProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/*" element={<AppLayout />} />
         </Routes>
       </ToastProvider>

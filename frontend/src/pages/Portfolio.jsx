@@ -7,6 +7,7 @@ import {
 import Header from '../components/Header';
 import { holdingsApi } from '../services/api';
 import { useToast } from '../components/Toast';
+import nifty500 from '../assets/nifty500.json';
 
 const formatCurrency = (v) => {
     if (v == null) return '₹0';
@@ -32,6 +33,10 @@ export default function Portfolio() {
         userId: 1, assetType: 'STOCK', assetName: '', assetSymbol: '',
         exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '',
     });
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [activeField, setActiveField] = useState(null);
+    
     const perPage = 6;
     const userId = localStorage.getItem('userId') || '1';
 
@@ -98,6 +103,36 @@ export default function Portfolio() {
             avgBuyPrice: h.avgBuyPrice, purchaseDate: h.purchaseDate || '',
         });
         setShowModal(true);
+    };
+
+    const handleSearchInput = (e, field) => {
+        const val = e.target.value;
+        setForm({ ...form, [field]: val });
+        setActiveField(field);
+        
+        if (val.length > 0) {
+            const lower=val.toLowerCase();
+            const filtered = nifty500.filter(item => 
+                (item.Symbol && item.Symbol.toLowerCase().includes(lower)) || 
+                (item['Company Name'] && item['Company Name'].toLowerCase().includes(lower))
+            ).slice(0, 10);
+            
+            setSuggestions(filtered);
+            setShowSuggestions(true);
+        } else {
+            setShowSuggestions(false);
+            setSuggestions([]);
+        }
+    };
+
+    const handleSuggestionClick = (s) => {
+        setForm({
+            ...form,
+            assetSymbol: s.Symbol,
+            assetName: s['Company Name'],
+            exchange: 'NSE'
+        });
+        setShowSuggestions(false);
     };
 
     const handleSubmit = async (e) => {
@@ -279,27 +314,82 @@ export default function Portfolio() {
                             <form onSubmit={handleSubmit}>
                                 <div className="input-group">
                                     <label>Asset Type</label>
-                                    <select className="select-field" value={form.assetType} onChange={e => setForm({ ...form, assetType: e.target.value })}>
+                                    <select className="select-field" value={form.assetType} onChange={e => {
+                                        const newType = e.target.value;
+                                        if (newType === 'GOLD') {
+                                            setForm({ ...form, assetType: newType, assetName: 'Gold', assetSymbol: 'GOLD', exchange: 'NONE' });
+                                        } else {
+                                            setForm({ ...form, assetType: newType });
+                                        }
+                                    }}>
                                         {['STOCK', 'MUTUAL_FUND', 'ETF', 'BOND', 'GOLD'].map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
                                     </select>
                                 </div>
-                                <div className="input-group">
+                                {form.assetType !== 'GOLD' && (
+                                    <>
+                                        <div className="input-group autocomplete-container">
                                     <label>Asset Name</label>
-                                    <input className="input-field" placeholder="e.g. Reliance Industries" value={form.assetName} onChange={e => setForm({ ...form, assetName: e.target.value })} required />
+                                    <input 
+                                        className="input-field" 
+                                        placeholder="e.g. Reliance Industries" 
+                                        value={form.assetName} 
+                                        onChange={e => handleSearchInput(e, 'assetName')} 
+                                        onFocus={() => {
+                                            setActiveField('assetName');
+                                            if(suggestions.length > 0) setShowSuggestions(true);
+                                        }}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                        required 
+                                    />
+                                    {showSuggestions && activeField === 'assetName' && suggestions.length > 0 && (
+                                        <ul className="autocomplete-dropdown">
+                                            {suggestions.map(s => (
+                                                <li key={s.Symbol} className="autocomplete-item" onMouseDown={() => handleSuggestionClick(s)}>
+                                                    <span className="autocomplete-item-symbol">{s.Symbol}</span>
+                                                    <span className="autocomplete-item-name">{s['Company Name']}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
-                                <div className="input-group">
+                                <div className="input-group autocomplete-container">
                                     <label>Symbol</label>
-                                    <input className="input-field" placeholder="e.g. RELIANCE" value={form.assetSymbol} onChange={e => setForm({ ...form, assetSymbol: e.target.value })} required />
-                                </div>
+                                    <input 
+                                        className="input-field" 
+                                        placeholder="e.g. RELIANCE" 
+                                        value={form.assetSymbol} 
+                                        onChange={e => handleSearchInput(e, 'assetSymbol')} 
+                                        onFocus={() => {
+                                            setActiveField('assetSymbol');
+                                            if(suggestions.length > 0) setShowSuggestions(true);
+                                        }}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                        required 
+                                    />
+                                    {showSuggestions && activeField === 'assetSymbol' && suggestions.length > 0 && (
+                                        <ul className="autocomplete-dropdown">
+                                            {suggestions.map(s => (
+                                                <li key={s.Symbol} className="autocomplete-item" onMouseDown={() => handleSuggestionClick(s)}>
+                                                    <span className="autocomplete-item-symbol">{s.Symbol}</span>
+                                                    <span className="autocomplete-item-name">{s['Company Name']}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                        </div>
+                                    </>
+                                )}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                    <div className="input-group">
+                                    {form.assetType !== 'GOLD' && (
+                                        <div className="input-group">
                                         <label>Exchange</label>
                                         <select className="select-field" value={form.exchange} onChange={e => setForm({ ...form, exchange: e.target.value })}>
                                             <option value="NSE">NSE</option>
                                             <option value="BSE">BSE</option>
                                         </select>
                                     </div>
-                                    <div className="input-group">
+                                    )}
+                                    <div className="input-group" style={form.assetType === 'GOLD' ? { gridColumn: '1 / -1' } : {}}>
                                         <label>Purchase Date</label>
                                         <input className="input-field" type="date" value={form.purchaseDate} onChange={e => setForm({ ...form, purchaseDate: e.target.value })} />
                                     </div>
