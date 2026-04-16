@@ -16,11 +16,11 @@ public interface HoldingService {
     
     HoldingResponse getHoldingById(Long id);
     
-    List<HoldingResponse> getAllHoldingsForUser(Long userId);
+    List<HoldingResponse> getAllHoldingsForUser(String userId);
     
-    PortfolioSummaryResponse getPortfolioSummary(Long userId);
+    PortfolioSummaryResponse getPortfolioSummary(String userId);
     
     void refreshHoldingPrice(Long holdingId);
     
-    void refreshAllHoldingPrices(Long userId);
+    void refreshAllHoldingPrices(String userId);
 }

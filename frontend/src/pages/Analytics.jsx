@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/react';
 import { TrendingUp, BarChart3, Building2, Clock, Download } from 'lucide-react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -18,7 +19,7 @@ export default function Analytics() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [range, setRange] = useState('ALL');
-    const uid = localStorage.getItem('userId') || '1';
+    const { userId: uid } = useAuth();
 
     useEffect(() => {
         (async () => {

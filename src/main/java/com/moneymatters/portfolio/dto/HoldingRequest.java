@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class HoldingRequest {
 
-    @NotNull(message = "User ID required")
-    private Long userId;
+    @NotBlank(message = "User ID required")
+    private String userId;
 
     @NotNull(message = "Asset type required")
     private Holding.AssetType assetType;

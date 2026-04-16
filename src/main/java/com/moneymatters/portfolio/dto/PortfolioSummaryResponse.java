@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PortfolioSummaryResponse {
 
-    private Long userId;
+    private String userId;
     private BigDecimal totalInvested;
     private BigDecimal totalCurrentValue;
     private BigDecimal totalUnrealizedGain;

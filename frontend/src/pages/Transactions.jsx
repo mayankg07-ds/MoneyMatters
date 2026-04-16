@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/react';
 import { Search, Plus, Download, Wallet, TrendingUp, DollarSign, X, ArrowUp, ArrowDown } from 'lucide-react';
 import Header from '../components/Header';
 import { transactionsApi } from '../services/api';
@@ -22,13 +23,13 @@ export default function Transactions() {
     const [showModal, setShowModal] = useState(false);
     const toast = useToast();
 
+    const { userId: uid } = useAuth();
     const [form, setForm] = useState({
-        userId: 1, transactionType: 'BUY', assetType: 'STOCK', assetName: '',
+        userId: uid, transactionType: 'BUY', assetType: 'STOCK', assetName: '',
         assetSymbol: '', exchange: 'NSE', quantity: '', pricePerUnit: '',
         charges: '0', transactionDate: '', notes: '',
     });
     const perPage = 8;
-    const uid = localStorage.getItem('userId') || '1';
 
     useEffect(() => { load(); }, []);
 
@@ -113,7 +114,7 @@ export default function Transactions() {
         e.preventDefault();
         try {
             await transactionsApi.record({
-                ...form, userId: Number(uid),
+                ...form, userId: uid,
                 quantity: Number(form.quantity), pricePerUnit: Number(form.pricePerUnit),
                 charges: Number(form.charges || 0),
             });

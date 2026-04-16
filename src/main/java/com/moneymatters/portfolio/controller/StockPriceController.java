@@ -67,7 +67,7 @@ public class StockPriceController {
 
     @PostMapping("/update/user/{userId}")
     public ResponseEntity<ApiResponse<String>> updateAllHoldingsForUser(
-            @PathVariable Long userId) {
+            @PathVariable String userId) {
 
         priceUpdateService.updateAllHoldingsForUser(userId);
 

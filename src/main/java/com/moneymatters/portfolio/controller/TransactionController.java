@@ -40,7 +40,7 @@ public class TransactionController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<TransactionResponse>>> getUserTransactions(
-            @PathVariable Long userId) {
+            @PathVariable String userId) {
 
         List<TransactionResponse> transactions = transactionService.getUserTransactions(userId);
 
@@ -50,7 +50,7 @@ public class TransactionController {
 
     @GetMapping("/user/{userId}/symbol/{assetSymbol}")
     public ResponseEntity<ApiResponse<List<TransactionResponse>>> getTransactionsBySymbol(
-            @PathVariable Long userId,
+            @PathVariable String userId,
             @PathVariable String assetSymbol) {
 
         List<TransactionResponse> transactions = 
@@ -62,7 +62,7 @@ public class TransactionController {
 
     @GetMapping("/user/{userId}/date-range")
     public ResponseEntity<ApiResponse<List<TransactionResponse>>> getTransactionsByDateRange(
-            @PathVariable Long userId,
+            @PathVariable String userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
@@ -75,7 +75,7 @@ public class TransactionController {
 
     @GetMapping("/user/{userId}/symbol/{assetSymbol}/fifo")
     public ResponseEntity<ApiResponse<FIFOCalculationResult>> calculateFIFOGain(
-            @PathVariable Long userId,
+            @PathVariable String userId,
             @PathVariable String assetSymbol,
             @RequestParam BigDecimal quantity,
             @RequestParam BigDecimal salePrice) {

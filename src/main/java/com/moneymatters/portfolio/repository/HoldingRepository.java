@@ -12,17 +12,17 @@ import java.util.Optional;
 @Repository
 public interface HoldingRepository extends JpaRepository<Holding, Long> {
 
-    Optional<Holding> findByUserIdAndAssetSymbol(Long userId, String assetSymbol);
+    Optional<Holding> findByUserIdAndAssetSymbol(String userId, String assetSymbol);
 
-    List<Holding> findByUserId(Long userId);
+    List<Holding> findByUserId(String userId);
 
     @Query("SELECT h FROM Holding h WHERE h.userId = :userId AND h.active = true")
-    List<Holding> findActiveHoldingsByUserId(@Param("userId") Long userId);
+    List<Holding> findActiveHoldingsByUserId(@Param("userId") String userId);
 
-    List<Holding> findByUserIdAndAssetType(Long userId, Holding.AssetType assetType);
+    List<Holding> findByUserIdAndAssetType(String userId, Holding.AssetType assetType);
 
     List<Holding> findByAssetSymbol(String assetSymbol);
 
-    boolean existsByUserIdAndAssetSymbol(Long userId, String assetSymbol);
+    boolean existsByUserIdAndAssetSymbol(String userId, String assetSymbol);
 }
     

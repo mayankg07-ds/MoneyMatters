@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class HoldingResponse {
 
     private Long id;
-    private Long userId;
+    private String userId;
     private Holding.AssetType assetType;
     private String assetName;
     private String assetSymbol;

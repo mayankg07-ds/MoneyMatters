@@ -67,7 +67,7 @@ public class HoldingController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<HoldingResponse>>> getUserHoldings(
-            @PathVariable Long userId) {
+            @PathVariable String userId) {
 
         log.info("Fetching holdings for user {}", userId);
 
@@ -79,7 +79,7 @@ public class HoldingController {
 
     @GetMapping("/user/{userId}/summary")
     public ResponseEntity<ApiResponse<PortfolioSummaryResponse>> getPortfolioSummary(
-            @PathVariable Long userId) {
+            @PathVariable String userId) {
 
         log.info("Generating portfolio summary for user {}", userId);
 
@@ -100,7 +100,7 @@ public class HoldingController {
     }
 
     @PostMapping("/user/{userId}/refresh-prices")
-    public ResponseEntity<ApiResponse<Void>> refreshAllHoldingPrices(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<Void>> refreshAllHoldingPrices(@PathVariable String userId) {
 
         log.info("Refreshing all prices for user {}", userId);
 

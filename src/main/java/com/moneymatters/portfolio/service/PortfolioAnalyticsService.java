@@ -5,13 +5,13 @@ import java.time.LocalDate;
 
 public interface PortfolioAnalyticsService {
     
-    PortfolioAnalyticsResponse getPortfolioAnalytics(Long userId);
+    PortfolioAnalyticsResponse getPortfolioAnalytics(String userId);
     
     PortfolioAnalyticsResponse getPortfolioAnalyticsForDateRange(
-        Long userId, LocalDate startDate, LocalDate endDate);
+        String userId, LocalDate startDate, LocalDate endDate);
     
     /**
      * Clear analytics cache when portfolio is updated
      */
-    void clearAnalyticsCache(Long userId);
+    void clearAnalyticsCache(String userId);
 }

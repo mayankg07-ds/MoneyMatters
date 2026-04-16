@@ -141,7 +141,7 @@ public class HoldingServiceImpl implements HoldingService {
         Holding holding = holdingRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + id));
         
-        Long userId = holding.getUserId();
+        String userId = holding.getUserId();
         holdingRepository.deleteById(id);
         log.info("Holding deleted: {}", id);
         
@@ -160,7 +160,7 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HoldingResponse> getAllHoldingsForUser(Long userId) {
+    public List<HoldingResponse> getAllHoldingsForUser(String userId) {
         log.info("Fetching all holdings for user: {}", userId);
 
         List<Holding> holdings = holdingRepository.findByUserId(userId);
@@ -172,7 +172,7 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional(readOnly = true)
-    public PortfolioSummaryResponse getPortfolioSummary(Long userId) {
+    public PortfolioSummaryResponse getPortfolioSummary(String userId) {
         log.info("Generating portfolio summary for user: {}", userId);
 
         List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
@@ -287,7 +287,7 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional
-    public void refreshAllHoldingPrices(Long userId) {
+    public void refreshAllHoldingPrices(String userId) {
         log.info("Refreshing all holding prices for user: {}", userId);
 
         List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);

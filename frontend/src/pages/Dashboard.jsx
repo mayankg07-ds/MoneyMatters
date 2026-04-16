@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/react';
 import {
     Wallet, TrendingUp, ArrowUpRight, Percent,
     RefreshCw, Plus
@@ -31,7 +32,7 @@ export default function Dashboard() {
     const [transactions, setTransactions] = useState([]);
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
-    const userId = localStorage.getItem('userId') || '1';
+    const { userId } = useAuth();
 
     useEffect(() => {
         loadData();

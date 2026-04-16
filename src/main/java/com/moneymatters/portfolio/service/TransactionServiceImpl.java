@@ -88,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getUserTransactions(Long userId) {
+    public List<TransactionResponse> getUserTransactions(String userId) {
         List<Transaction> transactions = transactionRepository
             .findByUserIdOrderByTransactionDateDesc(userId);
 
@@ -99,7 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getTransactionsBySymbol(Long userId, String assetSymbol) {
+    public List<TransactionResponse> getTransactionsBySymbol(String userId, String assetSymbol) {
         List<Transaction> transactions = transactionRepository
             .findByUserIdAndAssetSymbol(userId, assetSymbol);
 
@@ -111,7 +111,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<TransactionResponse> getTransactionsByDateRange(
-            Long userId, LocalDate startDate, LocalDate endDate) {
+            String userId, LocalDate startDate, LocalDate endDate) {
 
         List<Transaction> transactions = transactionRepository
             .findByUserIdAndDateRange(userId, startDate, endDate);
@@ -124,7 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public FIFOCalculationResult calculateFIFOGain(
-            Long userId, String assetSymbol, BigDecimal quantityToSell, BigDecimal salePrice) {
+            String userId, String assetSymbol, BigDecimal quantityToSell, BigDecimal salePrice) {
 
         log.info("Calculating FIFO gain for {} units of {}", quantityToSell, assetSymbol);
 

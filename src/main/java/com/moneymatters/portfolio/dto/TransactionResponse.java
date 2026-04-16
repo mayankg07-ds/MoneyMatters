@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class TransactionResponse {
 
     private Long id;
-    private Long userId;
+    private String userId;
     private Long holdingId;
     private Transaction.TransactionType transactionType;
     private Holding.AssetType assetType;

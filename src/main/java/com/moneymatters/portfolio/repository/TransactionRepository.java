@@ -12,17 +12,17 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findByUserId(Long userId);
+    List<Transaction> findByUserId(String userId);
 
-    List<Transaction> findByUserIdOrderByTransactionDateDesc(Long userId);
+    List<Transaction> findByUserIdOrderByTransactionDateDesc(String userId);
 
-    List<Transaction> findByUserIdAndAssetSymbol(Long userId, String assetSymbol);
+    List<Transaction> findByUserIdAndAssetSymbol(String userId, String assetSymbol);
 
     @Query("SELECT t FROM Transaction t WHERE t.userId = :userId " +
            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
            "ORDER BY t.transactionDate DESC")
     List<Transaction> findByUserIdAndDateRange(
-        @Param("userId") Long userId,
+        @Param("userId") String userId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate);
 
@@ -31,6 +31,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
            "AND t.transactionType = 'BUY' " +
            "ORDER BY t.transactionDate ASC")
     List<Transaction> findBuyTransactionsForAsset(
-        @Param("userId") Long userId,
+        @Param("userId") String userId,
         @Param("assetSymbol") String assetSymbol);
 }

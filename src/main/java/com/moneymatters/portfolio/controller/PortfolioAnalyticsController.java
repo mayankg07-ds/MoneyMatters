@@ -21,7 +21,7 @@ public class PortfolioAnalyticsController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<PortfolioAnalyticsResponse>> getPortfolioAnalytics(
-            @PathVariable Long userId) {
+            @PathVariable String userId) {
 
         log.info("Generating analytics for user: {}", userId);
 
@@ -33,7 +33,7 @@ public class PortfolioAnalyticsController {
 
     @GetMapping("/user/{userId}/date-range")
     public ResponseEntity<ApiResponse<PortfolioAnalyticsResponse>> getAnalyticsForDateRange(
-            @PathVariable Long userId,
+            @PathVariable String userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 

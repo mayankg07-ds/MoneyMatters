@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/react';
 import {
     Building2, TrendingUp, Wallet, ArrowUpRight,
     Search, Plus, RefreshCw, MoreVertical,
@@ -29,8 +30,9 @@ export default function Portfolio() {
     const [sortKey, setSortKey] = useState(null);
     const [sortDir, setSortDir] = useState('asc');
     const toast = useToast();
+    const { userId } = useAuth();
     const [form, setForm] = useState({
-        userId: 1, assetType: 'STOCK', assetName: '', assetSymbol: '',
+        userId: userId, assetType: 'STOCK', assetName: '', assetSymbol: '',
         exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '',
     });
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -38,7 +40,6 @@ export default function Portfolio() {
     const [activeField, setActiveField] = useState(null);
     
     const perPage = 6;
-    const userId = localStorage.getItem('userId') || '1';
 
     useEffect(() => { loadData(); }, []);
 
@@ -91,14 +92,14 @@ export default function Portfolio() {
 
     const openAdd = () => {
         setEditingHolding(null);
-        setForm({ userId: Number(userId), assetType: 'STOCK', assetName: '', assetSymbol: '', exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '' });
+        setForm({ userId: userId, assetType: 'STOCK', assetName: '', assetSymbol: '', exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '' });
         setShowModal(true);
     };
 
     const openEdit = (h) => {
         setEditingHolding(h);
         setForm({
-            userId: Number(userId), assetType: h.assetType, assetName: h.assetName,
+            userId: userId, assetType: h.assetType, assetName: h.assetName,
             assetSymbol: h.assetSymbol, exchange: h.exchange, quantity: h.quantity,
             avgBuyPrice: h.avgBuyPrice, purchaseDate: h.purchaseDate || '',
         });

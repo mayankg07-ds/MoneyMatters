@@ -31,7 +31,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "portfolioAnalytics", key = "#userId")
-    public PortfolioAnalyticsResponse getPortfolioAnalytics(Long userId) {
+    public PortfolioAnalyticsResponse getPortfolioAnalytics(String userId) {
         log.info("Generating portfolio analytics for user: {}", userId);
 
         // Get all holdings
@@ -134,7 +134,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
     @Override
     @Transactional(readOnly = true)
     public PortfolioAnalyticsResponse getPortfolioAnalyticsForDateRange(
-            Long userId, LocalDate startDate, LocalDate endDate) {
+            String userId, LocalDate startDate, LocalDate endDate) {
 
         // Filter transactions by date range
         List<Transaction> transactions = transactionRepository
@@ -153,7 +153,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
     // PRIVATE HELPER METHODS
     // ============================================================
 
-    private BigDecimal calculateXIRR(Long userId, List<Transaction> transactions, 
+    private BigDecimal calculateXIRR(String userId, List<Transaction> transactions, 
                                      List<Holding> holdings, BigDecimal currentValue) {
         try {
             List<LocalDate> dates = new ArrayList<>();
@@ -276,7 +276,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
             .collect(Collectors.toList());
     }
 
-    private PortfolioAnalyticsResponse createEmptyAnalytics(Long userId) {
+    private PortfolioAnalyticsResponse createEmptyAnalytics(String userId) {
         return new PortfolioAnalyticsResponse(
             BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
             BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
@@ -290,7 +290,7 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
      * This method is called by TransactionService and HoldingService
      */
     @CacheEvict(value = "portfolioAnalytics", key = "#userId")
-    public void clearAnalyticsCache(Long userId) {
+    public void clearAnalyticsCache(String userId) {
         log.info("Clearing analytics cache for user: {}", userId);
     }
 }

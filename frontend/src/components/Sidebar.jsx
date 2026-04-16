@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import GradientText from './GradientText';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useUser, useClerk } from '@clerk/react';
 import './Sidebar.css';
 import {
     LayoutDashboard,
@@ -24,9 +24,10 @@ const navItems = [
 
 export default function Sidebar() {
     const location = useLocation();
-    const navigate = useNavigate();
+    const { signOut } = useClerk();
+    const { user } = useUser();
     const [mobileOpen, setMobileOpen] = useState(false);
-    const userName = localStorage.getItem('userName') || 'User';
+    const userName = user?.fullName || user?.firstName || 'User';
     const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
     const isActive = (path) => {
@@ -35,9 +36,7 @@ export default function Sidebar() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userName');
-        navigate('/login');
+        signOut({ redirectUrl: '/login' });
     };
 
     const closeMobile = () => setMobileOpen(false);

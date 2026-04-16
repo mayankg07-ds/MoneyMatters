@@ -12,14 +12,14 @@ public interface TransactionService {
     
     TransactionResponse recordTransaction(TransactionRequest request);
     
-    List<TransactionResponse> getUserTransactions(Long userId);
+    List<TransactionResponse> getUserTransactions(String userId);
     
-    List<TransactionResponse> getTransactionsBySymbol(Long userId, String assetSymbol);
+    List<TransactionResponse> getTransactionsBySymbol(String userId, String assetSymbol);
     
     List<TransactionResponse> getTransactionsByDateRange(
-        Long userId, LocalDate startDate, LocalDate endDate);
+        String userId, LocalDate startDate, LocalDate endDate);
     
-    FIFOCalculationResult calculateFIFOGain(Long userId, String assetSymbol, 
+    FIFOCalculationResult calculateFIFOGain(String userId, String assetSymbol, 
         BigDecimal quantityToSell, BigDecimal salePrice);
     
     void deleteTransaction(Long transactionId);
