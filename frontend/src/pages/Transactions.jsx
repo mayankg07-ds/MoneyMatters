@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/react';
 import { Search, Plus, Download, Wallet, TrendingUp, DollarSign, X, ArrowUp, ArrowDown } from 'lucide-react';
 import Header from '../components/Header';
 import { transactionsApi } from '../services/api';
@@ -23,9 +22,8 @@ export default function Transactions() {
     const [showModal, setShowModal] = useState(false);
     const toast = useToast();
 
-    const { userId: uid } = useAuth();
     const [form, setForm] = useState({
-        userId: uid, transactionType: 'BUY', assetType: 'STOCK', assetName: '',
+        transactionType: 'BUY', assetType: 'STOCK', assetName: '',
         assetSymbol: '', exchange: 'NSE', quantity: '', pricePerUnit: '',
         charges: '0', transactionDate: '', notes: '',
     });
@@ -36,7 +34,7 @@ export default function Transactions() {
     const load = async () => {
         setLoading(true);
         try {
-            const r = await transactionsApi.getByUser(uid);
+            const r = await transactionsApi.getByUser();
             setTxs(r.data.data || []);
         } catch (e) { console.error(e); toast.error('Failed to load transactions'); }
         setLoading(false);

@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,9 +37,30 @@ public class PortfolioIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final Long TEST_USER_ID = 999L;
+    private static final String TEST_USER_ID = "test-user-999";
     private static Long createdHoldingId;
     private static Long createdTransactionId;
+
+    /** Reusable JWT mock that sets subject = TEST_USER_ID */
+    private static JwtRequestPostProcessor mockJwt() {
+        return jwt().jwt(j -> j
+            .subject(TEST_USER_ID)
+            .claim("email", "test@example.com"));
+    }
+
+    // ============================================================
+    // SECURITY SMOKE TEST
+    // ============================================================
+
+    @Test
+    @Order(0)
+    @DisplayName("0. Unauthenticated request → 401")
+    void testUnauthenticatedReturns401() throws Exception {
+        mockMvc.perform(get("/v1/portfolio/holdings/user"))
+            .andExpect(status().isUnauthorized());
+
+        System.out.println("✅ Test 0: 401 returned for request with no token");
+    }
 
     // ============================================================
     // TEST 1: CREATE HOLDING
@@ -48,7 +71,6 @@ public class PortfolioIntegrationTest {
     @DisplayName("1. Create Holding - BUY Reliance Stock")
     void testCreateHolding() throws Exception {
         HoldingRequest request = new HoldingRequest(
-            TEST_USER_ID,
             Holding.AssetType.STOCK,
             "Reliance Industries",
             "RELIANCE_TEST",
@@ -59,6 +81,7 @@ public class PortfolioIntegrationTest {
         );
 
         MvcResult result = mockMvc.perform(post("/v1/portfolio/holdings")
+                .with(mockJwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -90,7 +113,8 @@ public class PortfolioIntegrationTest {
     @Order(2)
     @DisplayName("2. Get Holding by ID")
     void testGetHolding() throws Exception {
-        mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId))
+        mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId)
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data.id").value(createdHoldingId))
@@ -107,7 +131,8 @@ public class PortfolioIntegrationTest {
     @Order(3)
     @DisplayName("3. Get All Holdings for User")
     void testGetUserHoldings() throws Exception {
-        mockMvc.perform(get("/v1/portfolio/holdings/user/" + TEST_USER_ID))
+        mockMvc.perform(get("/v1/portfolio/holdings/user")
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data").isArray())
@@ -125,7 +150,6 @@ public class PortfolioIntegrationTest {
     @DisplayName("4. Record BUY Transaction")
     void testRecordBuyTransaction() throws Exception {
         TransactionRequest request = new TransactionRequest(
-            TEST_USER_ID,
             Transaction.TransactionType.BUY,
             Holding.AssetType.STOCK,
             "Reliance Industries",
@@ -139,6 +163,7 @@ public class PortfolioIntegrationTest {
         );
 
         MvcResult result = mockMvc.perform(post("/v1/portfolio/transactions")
+                .with(mockJwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -167,7 +192,8 @@ public class PortfolioIntegrationTest {
     @Order(5)
     @DisplayName("5. Verify Holding Updated After BUY")
     void testHoldingUpdatedAfterBuy() throws Exception {
-        MvcResult result = mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId))
+        MvcResult result = mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId)
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andReturn();
@@ -178,18 +204,14 @@ public class PortfolioIntegrationTest {
             HoldingResponse.class
         );
 
-        // Quantity should now be 150 (100 + 50)
         assertEquals(0, holding.getQuantity().compareTo(new BigDecimal("150.000000")));
 
-        // Average price should be recalculated
-        // (100*2500 + 50*2700) / 150 = (250000 + 135000) / 150 = 2566.67
         assertTrue(holding.getAvgBuyPrice().compareTo(new BigDecimal("2566")) > 0);
         assertTrue(holding.getAvgBuyPrice().compareTo(new BigDecimal("2567")) < 0);
 
-        // Total invested should be 385,150 (385000 + 150 charges)
         assertTrue(holding.getTotalInvested().compareTo(new BigDecimal("385000")) > 0);
 
-        System.out.println("✅ Test 5: Holding updated correctly - Quantity: " + 
+        System.out.println("✅ Test 5: Holding updated correctly - Quantity: " +
             holding.getQuantity() + ", Avg Price: " + holding.getAvgBuyPrice());
     }
 
@@ -201,9 +223,8 @@ public class PortfolioIntegrationTest {
     @Order(6)
     @DisplayName("6. Calculate FIFO Gain (Hypothetical)")
     void testCalculateFIFOGain() throws Exception {
-        // Calculate FIFO for selling 120 shares at ₹2900
-        mockMvc.perform(get("/v1/portfolio/transactions/user/" + TEST_USER_ID + 
-                "/symbol/RELIANCE_TEST/fifo")
+        mockMvc.perform(get("/v1/portfolio/transactions/user/symbol/RELIANCE_TEST/fifo")
+                .with(mockJwt())
                 .param("quantity", "120")
                 .param("salePrice", "2900"))
             .andExpect(status().isOk())
@@ -226,7 +247,6 @@ public class PortfolioIntegrationTest {
     @DisplayName("7. Record SELL Transaction")
     void testRecordSellTransaction() throws Exception {
         TransactionRequest request = new TransactionRequest(
-            TEST_USER_ID,
             Transaction.TransactionType.SELL,
             Holding.AssetType.STOCK,
             "Reliance Industries",
@@ -240,6 +260,7 @@ public class PortfolioIntegrationTest {
         );
 
         mockMvc.perform(post("/v1/portfolio/transactions")
+                .with(mockJwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -257,7 +278,8 @@ public class PortfolioIntegrationTest {
     @Order(8)
     @DisplayName("8. Verify Holding Updated After SELL")
     void testHoldingUpdatedAfterSell() throws Exception {
-        MvcResult result = mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId))
+        MvcResult result = mockMvc.perform(get("/v1/portfolio/holdings/" + createdHoldingId)
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andReturn();
@@ -268,7 +290,6 @@ public class PortfolioIntegrationTest {
             HoldingResponse.class
         );
 
-        // Quantity should now be 30 (150 - 120)
         assertEquals(0, holding.getQuantity().compareTo(new BigDecimal("30.000000")));
 
         System.out.println("✅ Test 8: Holding quantity reduced to: " + holding.getQuantity());
@@ -282,16 +303,15 @@ public class PortfolioIntegrationTest {
     @Order(9)
     @DisplayName("9. Get All Transactions for User")
     void testGetUserTransactions() throws Exception {
-        MvcResult result = mockMvc.perform(get("/v1/portfolio/transactions/user/" + TEST_USER_ID))
+        MvcResult result = mockMvc.perform(get("/v1/portfolio/transactions/user")
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data").isArray())
             .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
-        
-        // Should have 2 transactions (1 BUY + 1 SELL)
-        // Note: Initial holding creation may or may not create a transaction
+
         assertTrue(responseContent.contains("BUY"));
         assertTrue(responseContent.contains("SELL"));
 
@@ -306,8 +326,8 @@ public class PortfolioIntegrationTest {
     @Order(10)
     @DisplayName("10. Get Portfolio Summary")
     void testGetPortfolioSummary() throws Exception {
-        MvcResult result = mockMvc.perform(
-                get("/v1/portfolio/holdings/user/" + TEST_USER_ID + "/summary"))
+        MvcResult result = mockMvc.perform(get("/v1/portfolio/holdings/user/summary")
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data.totalHoldings").exists())
@@ -315,9 +335,8 @@ public class PortfolioIntegrationTest {
             .andExpect(jsonPath("$.data.totalCurrentValue").exists())
             .andReturn();
 
-        String responseContent = result.getResponse().getContentAsString();
         System.out.println("✅ Test 10: Portfolio summary generated");
-        System.out.println(responseContent);
+        System.out.println(result.getResponse().getContentAsString());
     }
 
     // ============================================================
@@ -328,8 +347,8 @@ public class PortfolioIntegrationTest {
     @Order(11)
     @DisplayName("11. Get Portfolio Analytics with XIRR")
     void testGetPortfolioAnalytics() throws Exception {
-        MvcResult result = mockMvc.perform(
-                get("/v1/portfolio/analytics/user/" + TEST_USER_ID))
+        MvcResult result = mockMvc.perform(get("/v1/portfolio/analytics/user")
+                .with(mockJwt()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data.totalInvested").exists())
@@ -356,7 +375,7 @@ public class PortfolioIntegrationTest {
     }
 
     // ============================================================
-    // TEST 12: REFRESH PRICES (if stock price service is available)
+    // TEST 12: REFRESH PRICES
     // ============================================================
 
     @Test
@@ -364,7 +383,8 @@ public class PortfolioIntegrationTest {
     @DisplayName("12. Refresh Holding Prices")
     void testRefreshPrices() throws Exception {
         try {
-            mockMvc.perform(post("/v1/portfolio/holdings/user/" + TEST_USER_ID + "/refresh-prices"))
+            mockMvc.perform(post("/v1/portfolio/holdings/user/refresh-prices")
+                    .with(mockJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
@@ -383,17 +403,17 @@ public class PortfolioIntegrationTest {
     @DisplayName("13. Update Holding Quantity")
     void testUpdateHolding() throws Exception {
         HoldingRequest request = new HoldingRequest(
-            TEST_USER_ID,
             Holding.AssetType.STOCK,
             "Reliance Industries",
             "RELIANCE_TEST",
             "NSE",
-            new BigDecimal("50"),  // Update to 50 shares
+            new BigDecimal("50"),
             new BigDecimal("2600.00"),
             LocalDate.of(2024, 1, 15)
         );
 
         mockMvc.perform(put("/v1/portfolio/holdings/" + createdHoldingId)
+                .with(mockJwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
@@ -412,20 +432,20 @@ public class PortfolioIntegrationTest {
     @DisplayName("14. Record Dividend Transaction")
     void testRecordDividendTransaction() throws Exception {
         TransactionRequest request = new TransactionRequest(
-            TEST_USER_ID,
             Transaction.TransactionType.DIVIDEND,
             Holding.AssetType.STOCK,
             "Reliance Industries",
             "RELIANCE_TEST",
             "NSE",
-            new BigDecimal("50"),  // 50 shares
-            new BigDecimal("10.00"),  // ₹10 per share
+            new BigDecimal("50"),
+            new BigDecimal("10.00"),
             BigDecimal.ZERO,
             LocalDate.of(2024, 7, 15),
             "Dividend received"
         );
 
         mockMvc.perform(post("/v1/portfolio/transactions")
+                .with(mockJwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -444,7 +464,8 @@ public class PortfolioIntegrationTest {
     @DisplayName("15. Delete Transaction")
     void testDeleteTransaction() throws Exception {
         if (createdTransactionId != null) {
-            mockMvc.perform(delete("/v1/portfolio/transactions/" + createdTransactionId))
+            mockMvc.perform(delete("/v1/portfolio/transactions/" + createdTransactionId)
+                    .with(mockJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
@@ -461,7 +482,8 @@ public class PortfolioIntegrationTest {
     @DisplayName("16. Delete Holding")
     void testDeleteHolding() throws Exception {
         if (createdHoldingId != null) {
-            mockMvc.perform(delete("/v1/portfolio/holdings/" + createdHoldingId))
+            mockMvc.perform(delete("/v1/portfolio/holdings/" + createdHoldingId)
+                    .with(mockJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
@@ -478,8 +500,9 @@ public class PortfolioIntegrationTest {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PORTFOLIO INTEGRATION TEST SUITE COMPLETED");
         System.out.println("=".repeat(60));
-        System.out.println("✅ All 16 tests passed successfully!");
+        System.out.println("✅ All 17 tests passed successfully!");
         System.out.println("\nTests Covered:");
+        System.out.println("  0. 401 for unauthenticated request");
         System.out.println("  1. Create Holding");
         System.out.println("  2. Get Holding by ID");
         System.out.println("  3. Get User Holdings");

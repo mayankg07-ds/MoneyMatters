@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/react';
 import {
     Building2, TrendingUp, Wallet, ArrowUpRight,
     Search, Plus, RefreshCw, MoreVertical,
@@ -30,9 +29,8 @@ export default function Portfolio() {
     const [sortKey, setSortKey] = useState(null);
     const [sortDir, setSortDir] = useState('asc');
     const toast = useToast();
-    const { userId } = useAuth();
     const [form, setForm] = useState({
-        userId: userId, assetType: 'STOCK', assetName: '', assetSymbol: '',
+        assetType: 'STOCK', assetName: '', assetSymbol: '',
         exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '',
     });
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -47,8 +45,8 @@ export default function Portfolio() {
         setLoading(true);
         try {
             const [hRes, sRes] = await Promise.allSettled([
-                holdingsApi.getByUser(userId),
-                holdingsApi.getSummary(userId),
+                holdingsApi.getByUser(),
+                holdingsApi.getSummary(),
             ]);
             if (hRes.status === 'fulfilled') setHoldings(hRes.value.data.data || []);
             if (sRes.status === 'fulfilled') setSummary(sRes.value.data.data);
@@ -87,19 +85,19 @@ export default function Portfolio() {
     );
 
     const handleRefreshAll = async () => {
-        try { await holdingsApi.refreshAll(userId); loadData(); toast.success('Prices refreshed'); } catch (e) { console.error(e); toast.error('Failed to refresh prices'); }
+        try { await holdingsApi.refreshAll(); loadData(); toast.success('Prices refreshed'); } catch (e) { console.error(e); toast.error('Failed to refresh prices'); }
     };
 
     const openAdd = () => {
         setEditingHolding(null);
-        setForm({ userId: userId, assetType: 'STOCK', assetName: '', assetSymbol: '', exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '' });
+        setForm({ assetType: 'STOCK', assetName: '', assetSymbol: '', exchange: 'NSE', quantity: '', avgBuyPrice: '', purchaseDate: '' });
         setShowModal(true);
     };
 
     const openEdit = (h) => {
         setEditingHolding(h);
         setForm({
-            userId: userId, assetType: h.assetType, assetName: h.assetName,
+            assetType: h.assetType, assetName: h.assetName,
             assetSymbol: h.assetSymbol, exchange: h.exchange, quantity: h.quantity,
             avgBuyPrice: h.avgBuyPrice, purchaseDate: h.purchaseDate || '',
         });

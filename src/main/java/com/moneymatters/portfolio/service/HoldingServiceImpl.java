@@ -35,42 +35,37 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional
-    public HoldingResponse createHolding(HoldingRequest request) {
-        log.info("Creating holding for user {}: {}", request.getUserId(), request.getAssetSymbol());
+    public HoldingResponse createHolding(String clerkUserId, HoldingRequest request) {
+        log.info("Creating holding for user {}: {}", clerkUserId, request.getAssetSymbol());
 
-        // Check if holding already exists
-        if (holdingRepository.existsByUserIdAndAssetSymbol(request.getUserId(), request.getAssetSymbol())) {
+        if (holdingRepository.existsByClerkUserIdAndAssetSymbol(clerkUserId, request.getAssetSymbol())) {
             throw new RuntimeException("Holding already exists for this symbol. Use update instead.");
         }
 
-        // Create holding entity
         Holding holding = new Holding();
-        holding.setUserId(request.getUserId());
+        holding.setClerkUserId(clerkUserId);
         holding.setAssetType(request.getAssetType());
         holding.setAssetName(request.getAssetName());
         holding.setAssetSymbol(request.getAssetSymbol());
         holding.setExchange(request.getExchange());
         holding.setQuantity(request.getQuantity());
         holding.setAvgBuyPrice(request.getAvgBuyPrice());
-        
-        // Calculate total invested
+
         BigDecimal totalInvested = request.getQuantity()
             .multiply(request.getAvgBuyPrice())
             .setScale(2, RoundingMode.HALF_UP);
         holding.setTotalInvested(totalInvested);
-        
-        holding.setPurchaseDate(request.getPurchaseDate() != null ? 
+
+        holding.setPurchaseDate(request.getPurchaseDate() != null ?
             request.getPurchaseDate() : LocalDate.now());
 
-        // Fetch current price
         String yahooSymbol = stockPriceService.toYahooSymbol(
-            request.getAssetSymbol(), 
+            request.getAssetSymbol(),
             request.getExchange()
         );
-        
+
         BigDecimal currentPrice = stockPriceService.getCurrentPrice(yahooSymbol);
         if (currentPrice == null) {
-            // If price not available, use buy price as current price
             currentPrice = request.getAvgBuyPrice();
             log.warn("Could not fetch current price for {}. Using buy price.", request.getAssetSymbol());
         }
@@ -80,9 +75,8 @@ public class HoldingServiceImpl implements HoldingService {
         Holding saved = holdingRepository.save(holding);
         log.info("Holding created with ID: {}", saved.getId());
 
-        // Create initial BUY transaction for tracking cost basis
         Transaction initialTransaction = Transaction.builder()
-            .userId(request.getUserId())
+            .clerkUserId(clerkUserId)
             .holdingId(saved.getId())
             .transactionType(Transaction.TransactionType.BUY)
             .assetType(request.getAssetType())
@@ -98,8 +92,7 @@ public class HoldingServiceImpl implements HoldingService {
             .build();
         transactionRepository.save(initialTransaction);
 
-        // Clear analytics cache for the user
-        portfolioAnalyticsService.clearAnalyticsCache(request.getUserId());
+        portfolioAnalyticsService.clearAnalyticsCache(clerkUserId);
 
         return HoldingResponse.fromEntity(saved);
     }
@@ -112,23 +105,20 @@ public class HoldingServiceImpl implements HoldingService {
         Holding holding = holdingRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + id));
 
-        // Update fields
         holding.setQuantity(request.getQuantity());
         holding.setAvgBuyPrice(request.getAvgBuyPrice());
-        
+
         BigDecimal totalInvested = request.getQuantity()
             .multiply(request.getAvgBuyPrice())
             .setScale(2, RoundingMode.HALF_UP);
         holding.setTotalInvested(totalInvested);
 
-        // Recalculate with current price
         calculateHoldingValues(holding, holding.getCurrentPrice());
 
         Holding updated = holdingRepository.save(holding);
         log.info("Holding updated: {}", id);
 
-        // Clear analytics cache for the user
-        portfolioAnalyticsService.clearAnalyticsCache(holding.getUserId());
+        portfolioAnalyticsService.clearAnalyticsCache(holding.getClerkUserId());
 
         return HoldingResponse.fromEntity(updated);
     }
@@ -140,13 +130,12 @@ public class HoldingServiceImpl implements HoldingService {
 
         Holding holding = holdingRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + id));
-        
-        String userId = holding.getUserId();
+
+        String clerkUserId = holding.getClerkUserId();
         holdingRepository.deleteById(id);
         log.info("Holding deleted: {}", id);
-        
-        // Clear analytics cache for the user
-        portfolioAnalyticsService.clearAnalyticsCache(userId);
+
+        portfolioAnalyticsService.clearAnalyticsCache(clerkUserId);
     }
 
     @Override
@@ -160,10 +149,10 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HoldingResponse> getAllHoldingsForUser(String userId) {
-        log.info("Fetching all holdings for user: {}", userId);
+    public List<HoldingResponse> getAllHoldingsForUser(String clerkUserId) {
+        log.info("Fetching all holdings for user: {}", clerkUserId);
 
-        List<Holding> holdings = holdingRepository.findByUserId(userId);
+        List<Holding> holdings = holdingRepository.findByClerkUserId(clerkUserId);
 
         return holdings.stream()
             .map(HoldingResponse::fromEntity)
@@ -172,14 +161,14 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional(readOnly = true)
-    public PortfolioSummaryResponse getPortfolioSummary(String userId) {
-        log.info("Generating portfolio summary for user: {}", userId);
+    public PortfolioSummaryResponse getPortfolioSummary(String clerkUserId) {
+        log.info("Generating portfolio summary for user: {}", clerkUserId);
 
-        List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
+        List<Holding> holdings = holdingRepository.findActiveHoldingsByClerkUserId(clerkUserId);
 
         if (holdings.isEmpty()) {
             return new PortfolioSummaryResponse(
-                userId,
+                clerkUserId,
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,
@@ -190,7 +179,6 @@ public class HoldingServiceImpl implements HoldingService {
             );
         }
 
-        // Calculate totals
         BigDecimal totalInvested = holdings.stream()
             .map(Holding::getTotalInvested)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -208,7 +196,6 @@ public class HoldingServiceImpl implements HoldingService {
                 .divide(totalInvested, 4, RoundingMode.HALF_UP);
         }
 
-        // Asset type breakdown
         Map<Holding.AssetType, List<Holding>> holdingsByType = holdings.stream()
             .collect(Collectors.groupingBy(Holding::getAssetType));
 
@@ -247,7 +234,7 @@ public class HoldingServiceImpl implements HoldingService {
             .collect(Collectors.toList());
 
         return new PortfolioSummaryResponse(
-            userId,
+            clerkUserId,
             totalInvested,
             totalCurrentValue,
             totalUnrealizedGain,
@@ -267,7 +254,7 @@ public class HoldingServiceImpl implements HoldingService {
             .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + holdingId));
 
         String yahooSymbol = stockPriceService.toYahooSymbol(
-            holding.getAssetSymbol(), 
+            holding.getAssetSymbol(),
             holding.getExchange()
         );
 
@@ -277,9 +264,8 @@ public class HoldingServiceImpl implements HoldingService {
             calculateHoldingValues(holding, currentPrice);
             holdingRepository.save(holding);
             log.info("Price refreshed for holding {}: {}", holdingId, currentPrice);
-            
-            // Clear analytics cache for the user
-            portfolioAnalyticsService.clearAnalyticsCache(holding.getUserId());
+
+            portfolioAnalyticsService.clearAnalyticsCache(holding.getClerkUserId());
         } else {
             log.warn("Could not refresh price for holding: {}", holdingId);
         }
@@ -287,28 +273,25 @@ public class HoldingServiceImpl implements HoldingService {
 
     @Override
     @Transactional
-    public void refreshAllHoldingPrices(String userId) {
-        log.info("Refreshing all holding prices for user: {}", userId);
+    public void refreshAllHoldingPrices(String clerkUserId) {
+        log.info("Refreshing all holding prices for user: {}", clerkUserId);
 
-        List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
+        List<Holding> holdings = holdingRepository.findActiveHoldingsByClerkUserId(clerkUserId);
 
         if (holdings.isEmpty()) {
-            log.info("No holdings to refresh for user: {}", userId);
+            log.info("No holdings to refresh for user: {}", clerkUserId);
             return;
         }
 
-        // Get all Yahoo symbols
         List<String> yahooSymbols = holdings.stream()
             .map(h -> stockPriceService.toYahooSymbol(h.getAssetSymbol(), h.getExchange()))
             .collect(Collectors.toList());
 
-        // Fetch all prices in one call
         Map<String, BigDecimal> prices = stockPriceService.getCurrentPrices(yahooSymbols);
 
-        // Update each holding
         for (Holding holding : holdings) {
             String yahooSymbol = stockPriceService.toYahooSymbol(
-                holding.getAssetSymbol(), 
+                holding.getAssetSymbol(),
                 holding.getExchange()
             );
 
@@ -320,14 +303,10 @@ public class HoldingServiceImpl implements HoldingService {
 
         holdingRepository.saveAll(holdings);
         log.info("Refreshed prices for {} holdings", holdings.size());
-        
-        // Clear analytics cache for the user
-        portfolioAnalyticsService.clearAnalyticsCache(userId);
+
+        portfolioAnalyticsService.clearAnalyticsCache(clerkUserId);
     }
 
-    /**
-     * Helper method to calculate holding values
-     */
     private void calculateHoldingValues(Holding holding, BigDecimal currentPrice) {
         holding.setCurrentPrice(currentPrice);
 

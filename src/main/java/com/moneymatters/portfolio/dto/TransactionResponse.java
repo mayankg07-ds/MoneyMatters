@@ -37,7 +37,7 @@ public class TransactionResponse {
     public static TransactionResponse fromEntity(Transaction transaction) {
         return new TransactionResponse(
             transaction.getId(),
-            transaction.getUserId(),
+            transaction.getClerkUserId(),
             transaction.getHoldingId(),
             transaction.getTransactionType(),
             transaction.getAssetType(),

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@clerk/react';
+import { useAxiosInterceptor } from './services/setupAxiosInterceptor';
 import { ToastProvider } from './components/Toast';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
@@ -27,6 +28,7 @@ function ProtectedRoute({ children }) {
 }
 
 function AppLayout() {
+  useAxiosInterceptor();
   const location = useLocation();
   if (location.pathname === '/login') return null;
 
