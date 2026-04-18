@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class HoldingRequest {
 
-    @NotBlank(message = "User ID required")
-    private String userId;
-
     @NotNull(message = "Asset type required")
     private Holding.AssetType assetType;
 
@@ -27,7 +24,7 @@ public class HoldingRequest {
     private String assetSymbol;
 
     @NotBlank(message = "Exchange required")
-    private String exchange;  // "NSE", "BSE"
+    private String exchange;
 
     @NotNull(message = "Quantity required")
     @Positive(message = "Quantity must be positive")

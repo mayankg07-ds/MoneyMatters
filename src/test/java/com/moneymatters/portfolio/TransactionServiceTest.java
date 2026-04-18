@@ -31,65 +31,52 @@ public class TransactionServiceTest {
     @Autowired
     private HoldingService holdingService;
 
+    private static final String TEST_USER = "test-user-unit-2";
+
     @Test
     void testBuyTransaction() {
-        TransactionRequest request = createBuyTransaction(
-            "user1","TEST", new BigDecimal("100"), new BigDecimal("1000")
-        );
+        TransactionRequest request = createBuyTransaction("TEST", new BigDecimal("100"), new BigDecimal("1000"));
 
-        TransactionResponse response = transactionService.recordTransaction(request);
+        TransactionResponse response = transactionService.recordTransaction(TEST_USER, request);
 
         assertNotNull(response);
         assertNotNull(response.getId());
         assertEquals(Transaction.TransactionType.BUY, response.getTransactionType());
 
-        // Verify holding was created/updated
-        List<HoldingResponse> holdings = holdingService.getAllHoldingsForUser("user1");
+        List<HoldingResponse> holdings = holdingService.getAllHoldingsForUser(TEST_USER);
         assertFalse(holdings.isEmpty());
     }
 
     @Test
     void testFIFOCalculation() {
-        // Buy 100 @ 1000
-        transactionService.recordTransaction(
-            createBuyTransaction("user1","FIFO", new BigDecimal("100"), new BigDecimal("1000"))
-        );
+        transactionService.recordTransaction(TEST_USER,
+            createBuyTransaction("FIFO", new BigDecimal("100"), new BigDecimal("1000")));
 
-        // Buy 50 @ 1200
-        transactionService.recordTransaction(
-            createBuyTransaction("user1","FIFO", new BigDecimal("50"), new BigDecimal("1200"))
-        );
+        transactionService.recordTransaction(TEST_USER,
+            createBuyTransaction("FIFO", new BigDecimal("50"), new BigDecimal("1200")));
 
-        // Calculate FIFO for selling 120 @ 1500
         FIFOCalculationResult result = transactionService.calculateFIFOGain(
-            "user1","FIFO", new BigDecimal("120"), new BigDecimal("1500")
+            TEST_USER, "FIFO", new BigDecimal("120"), new BigDecimal("1500")
         );
 
         assertNotNull(result);
         assertEquals(2, result.getBatches().size());
 
-        // First batch: 100 shares @ 1000
         assertEquals(new BigDecimal("100"), result.getBatches().get(0).getQuantitySold());
         assertEquals(new BigDecimal("1000"), result.getBatches().get(0).getPurchasePrice());
 
-        // Second batch: 20 shares @ 1200
         assertEquals(new BigDecimal("20"), result.getBatches().get(1).getQuantitySold());
         assertEquals(new BigDecimal("1200"), result.getBatches().get(1).getPurchasePrice());
 
-        // Total gain = (1500-1000)*100 + (1500-1200)*20 = 50000 + 6000 = 56000
-        assertTrue(result.getTotalRealizedGain().compareTo(new BigDecimal("56000")) == 0);
+        assertEquals(0, result.getTotalRealizedGain().compareTo(new BigDecimal("56000")));
     }
 
     @Test
     void testSellTransaction() {
-        // Buy first
-        transactionService.recordTransaction(
-            createBuyTransaction("user1","SELL", new BigDecimal("100"), new BigDecimal("1000"))
-        );
+        transactionService.recordTransaction(TEST_USER,
+            createBuyTransaction("SELL", new BigDecimal("100"), new BigDecimal("1000")));
 
-        // Sell
         TransactionRequest sellRequest = new TransactionRequest(
-            "user1",
             Transaction.TransactionType.SELL,
             Holding.AssetType.STOCK,
             "SELL Stock",
@@ -102,12 +89,11 @@ public class TransactionServiceTest {
             "Selling 50"
         );
 
-        TransactionResponse response = transactionService.recordTransaction(sellRequest);
+        TransactionResponse response = transactionService.recordTransaction(TEST_USER, sellRequest);
 
         assertNotNull(response);
 
-        // Verify holding quantity reduced
-        List<HoldingResponse> holdings = holdingService.getAllHoldingsForUser("user1");
+        List<HoldingResponse> holdings = holdingService.getAllHoldingsForUser(TEST_USER);
         HoldingResponse holding = holdings.stream()
             .filter(h -> h.getAssetSymbol().equals("SELL"))
             .findFirst()
@@ -117,10 +103,9 @@ public class TransactionServiceTest {
         assertEquals(0, new BigDecimal("50").compareTo(holding.getQuantity()));
     }
 
-    private TransactionRequest createBuyTransaction(String userId, String symbol,
-                                                     BigDecimal quantity, BigDecimal price) {
+    private TransactionRequest createBuyTransaction(String symbol,
+                                                    BigDecimal quantity, BigDecimal price) {
         return new TransactionRequest(
-            userId,
             Transaction.TransactionType.BUY,
             Holding.AssetType.STOCK,
             symbol + " Stock",

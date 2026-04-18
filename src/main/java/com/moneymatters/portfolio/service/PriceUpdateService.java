@@ -50,7 +50,7 @@ public class PriceUpdateService {
      */
     @Transactional
     public void updateAllHoldingsForUser(String userId) {
-        List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
+        List<Holding> holdings = holdingRepository.findActiveHoldingsByClerkUserId(userId);
         
         if (holdings.isEmpty()) {
             log.info("No active holdings found for user {}", userId);
@@ -100,7 +100,7 @@ public class PriceUpdateService {
         
         // Group by user and update
         Map<String, List<Holding>> holdingsByUser = allHoldings.stream()
-            .collect(Collectors.groupingBy(Holding::getUserId));
+            .collect(Collectors.groupingBy(Holding::getClerkUserId));
         
         for (String userId : holdingsByUser.keySet()) {
             try {

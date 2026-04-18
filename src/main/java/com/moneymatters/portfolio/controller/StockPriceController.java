@@ -3,9 +3,12 @@ package com.moneymatters.portfolio.controller;
 import com.moneymatters.common.dto.ApiResponse;
 import com.moneymatters.portfolio.service.PriceUpdateService;
 import com.moneymatters.portfolio.service.StockPriceService;
+import com.moneymatters.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,59 +22,72 @@ public class StockPriceController {
 
     private final StockPriceService stockPriceService;
     private final PriceUpdateService priceUpdateService;
+    private final UserService userService;
 
     @GetMapping("/current/{symbol}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentPrice(
             @PathVariable String symbol,
-            @RequestParam(required = false, defaultValue = "NSE") String exchange) {
+            @RequestParam(required = false, defaultValue = "NSE") String exchange,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        userService.ensureUserExists(jwt.getSubject(), jwt.getClaimAsString("email"));
 
         String yahooSymbol = stockPriceService.toYahooSymbol(symbol, exchange);
         BigDecimal price = stockPriceService.getCurrentPrice(yahooSymbol);
 
         if (price == null) {
-            return ResponseEntity.ok(new ApiResponse<>(false, null, 
+            return ResponseEntity.ok(new ApiResponse<>(false, null,
                 "Price not found for symbol: " + symbol));
         }
 
-        return ResponseEntity.ok(new ApiResponse<>(true, 
-            Map.of("symbol", symbol, "price", price), 
+        return ResponseEntity.ok(new ApiResponse<>(true,
+            Map.of("symbol", symbol, "price", price),
             "Price fetched successfully"));
     }
 
     @GetMapping("/details/{symbol}")
     public ResponseEntity<ApiResponse<StockPriceService.StockDetails>> getStockDetails(
             @PathVariable String symbol,
-            @RequestParam(required = false, defaultValue = "NSE") String exchange) {
+            @RequestParam(required = false, defaultValue = "NSE") String exchange,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        userService.ensureUserExists(jwt.getSubject(), jwt.getClaimAsString("email"));
 
         String yahooSymbol = stockPriceService.toYahooSymbol(symbol, exchange);
         StockPriceService.StockDetails details = stockPriceService.getStockDetails(yahooSymbol);
 
         if (details == null) {
-            return ResponseEntity.ok(new ApiResponse<>(false, null, 
+            return ResponseEntity.ok(new ApiResponse<>(false, null,
                 "Details not found for symbol: " + symbol));
         }
 
-        return ResponseEntity.ok(new ApiResponse<>(true, details, 
+        return ResponseEntity.ok(new ApiResponse<>(true, details,
             "Stock details fetched successfully"));
     }
 
     @PostMapping("/update/holding/{holdingId}")
     public ResponseEntity<ApiResponse<String>> updateHoldingPrice(
-            @PathVariable Long holdingId) {
+            @PathVariable Long holdingId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        userService.ensureUserExists(jwt.getSubject(), jwt.getClaimAsString("email"));
 
         priceUpdateService.updateHoldingPrice(holdingId);
 
-        return ResponseEntity.ok(new ApiResponse<>(true, null, 
+        return ResponseEntity.ok(new ApiResponse<>(true, null,
             "Holding price updated successfully"));
     }
 
-    @PostMapping("/update/user/{userId}")
+    @PostMapping("/update/user")
     public ResponseEntity<ApiResponse<String>> updateAllHoldingsForUser(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal Jwt jwt) {
 
-        priceUpdateService.updateAllHoldingsForUser(userId);
+        String clerkUserId = jwt.getSubject();
+        userService.ensureUserExists(clerkUserId, jwt.getClaimAsString("email"));
 
-        return ResponseEntity.ok(new ApiResponse<>(true, null, 
+        priceUpdateService.updateAllHoldingsForUser(clerkUserId);
+
+        return ResponseEntity.ok(new ApiResponse<>(true, null,
             "All holdings updated successfully for user"));
     }
 }

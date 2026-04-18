@@ -29,68 +29,63 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionResponse recordTransaction(TransactionRequest request) {
+    public TransactionResponse recordTransaction(String clerkUserId, TransactionRequest request) {
         log.info("Recording {} transaction for user {}: {}",
-            request.getTransactionType(), request.getUserId(), request.getAssetSymbol());
+            request.getTransactionType(), clerkUserId, request.getAssetSymbol());
 
-        // Create transaction entity
         Transaction transaction = new Transaction();
-        transaction.setUserId(request.getUserId());
+        transaction.setClerkUserId(clerkUserId);
         transaction.setTransactionType(request.getTransactionType());
         transaction.setAssetType(request.getAssetType());
         transaction.setAssetName(request.getAssetName());
         transaction.setAssetSymbol(request.getAssetSymbol());
         transaction.setQuantity(request.getQuantity());
         transaction.setPricePerUnit(request.getPricePerUnit());
-        
+
         BigDecimal totalAmount = request.getQuantity()
             .multiply(request.getPricePerUnit())
             .setScale(2, RoundingMode.HALF_UP);
         transaction.setTotalAmount(totalAmount);
-        
-        BigDecimal charges = request.getCharges() != null ? 
+
+        BigDecimal charges = request.getCharges() != null ?
             request.getCharges() : BigDecimal.ZERO;
         transaction.setCharges(charges);
-        
+
         BigDecimal netAmount = totalAmount.add(charges);
         transaction.setNetAmount(netAmount);
-        
+
         transaction.setTransactionDate(request.getTransactionDate());
         transaction.setNotes(request.getNotes());
 
-        // Save transaction
         Transaction saved = transactionRepository.save(transaction);
 
-        // Update holding based on transaction type
         switch (request.getTransactionType()) {
             case BUY:
-                handleBuyTransaction(request);
+                handleBuyTransaction(clerkUserId, request);
                 break;
             case SELL:
-                handleSellTransaction(request, saved);
+                handleSellTransaction(clerkUserId, request, saved);
                 break;
             case DIVIDEND:
-                // No holding update needed
                 break;
             case BONUS:
             case SPLIT:
-                handleBonusOrSplit(request);
+                handleBonusOrSplit(clerkUserId, request);
                 break;
         }
 
         log.info("Transaction recorded with ID: {}", saved.getId());
-        
-        // Clear analytics cache for the user
-        portfolioAnalyticsService.clearAnalyticsCache(request.getUserId());
-        
+
+        portfolioAnalyticsService.clearAnalyticsCache(clerkUserId);
+
         return TransactionResponse.fromEntity(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getUserTransactions(String userId) {
+    public List<TransactionResponse> getUserTransactions(String clerkUserId) {
         List<Transaction> transactions = transactionRepository
-            .findByUserIdOrderByTransactionDateDesc(userId);
+            .findByClerkUserIdOrderByTransactionDateDesc(clerkUserId);
 
         return transactions.stream()
             .map(TransactionResponse::fromEntity)
@@ -99,9 +94,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getTransactionsBySymbol(String userId, String assetSymbol) {
+    public List<TransactionResponse> getTransactionsBySymbol(String clerkUserId, String assetSymbol) {
         List<Transaction> transactions = transactionRepository
-            .findByUserIdAndAssetSymbol(userId, assetSymbol);
+            .findByClerkUserIdAndAssetSymbol(clerkUserId, assetSymbol);
 
         return transactions.stream()
             .map(TransactionResponse::fromEntity)
@@ -111,10 +106,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<TransactionResponse> getTransactionsByDateRange(
-            String userId, LocalDate startDate, LocalDate endDate) {
+            String clerkUserId, LocalDate startDate, LocalDate endDate) {
 
         List<Transaction> transactions = transactionRepository
-            .findByUserIdAndDateRange(userId, startDate, endDate);
+            .findByClerkUserIdAndDateRange(clerkUserId, startDate, endDate);
 
         return transactions.stream()
             .map(TransactionResponse::fromEntity)
@@ -124,13 +119,12 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public FIFOCalculationResult calculateFIFOGain(
-            String userId, String assetSymbol, BigDecimal quantityToSell, BigDecimal salePrice) {
+            String clerkUserId, String assetSymbol, BigDecimal quantityToSell, BigDecimal salePrice) {
 
         log.info("Calculating FIFO gain for {} units of {}", quantityToSell, assetSymbol);
 
-        // Get all BUY transactions for this asset, ordered by date (FIFO)
         List<Transaction> buyTransactions = transactionRepository
-            .findBuyTransactionsForAsset(userId, assetSymbol);
+            .findBuyTransactionsForAsset(clerkUserId, assetSymbol);
 
         if (buyTransactions.isEmpty()) {
             throw new RuntimeException("No purchase history found for " + assetSymbol);
@@ -173,8 +167,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (remainingToSell.compareTo(BigDecimal.ZERO) > 0) {
             throw new RuntimeException(
-                "Insufficient holdings. Trying to sell " + quantityToSell + 
-                " but only have purchase history for " + 
+                "Insufficient holdings. Trying to sell " + quantityToSell +
+                " but only have purchase history for " +
                 quantityToSell.subtract(remainingToSell));
         }
 
@@ -201,7 +195,6 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
             .orElseThrow(() -> new RuntimeException("Transaction not found: " + transactionId));
 
-        // Reverse the holding changes
         reverseTransactionEffect(transaction);
 
         transactionRepository.deleteById(transactionId);
@@ -212,16 +205,13 @@ public class TransactionServiceImpl implements TransactionService {
     // PRIVATE HELPER METHODS
     // ============================================================
 
-    private void handleBuyTransaction(TransactionRequest request) {
-        // Find or create holding
+    private void handleBuyTransaction(String clerkUserId, TransactionRequest request) {
         Holding holding = holdingRepository
-            .findByUserIdAndAssetSymbol(request.getUserId(), request.getAssetSymbol())
+            .findByClerkUserIdAndAssetSymbol(clerkUserId, request.getAssetSymbol())
             .orElse(null);
 
         if (holding == null) {
-            // Create new holding
             HoldingRequest holdingRequest = new HoldingRequest(
-                request.getUserId(),
                 request.getAssetType(),
                 request.getAssetName(),
                 request.getAssetSymbol(),
@@ -230,20 +220,17 @@ public class TransactionServiceImpl implements TransactionService {
                 request.getPricePerUnit(),
                 request.getTransactionDate()
             );
-            holdingService.createHolding(holdingRequest);
+            holdingService.createHolding(clerkUserId, holdingRequest);
         } else {
-            // Update existing holding - recalculate average price
             BigDecimal transactionCost = request.getQuantity().multiply(request.getPricePerUnit());
             BigDecimal charges = request.getCharges() != null ? request.getCharges() : BigDecimal.ZERO;
-            
+
             BigDecimal totalQty = holding.getQuantity().add(request.getQuantity());
-            
-            // avgBuyPrice = total stock cost / total quantity (excluding charges)
+
             BigDecimal totalStockCost = holding.getAvgBuyPrice().multiply(holding.getQuantity())
                 .add(transactionCost);
             BigDecimal newAvgPrice = totalStockCost.divide(totalQty, 2, RoundingMode.HALF_UP);
-            
-            // totalInvested = total stock cost + all charges
+
             BigDecimal totalCost = holding.getTotalInvested()
                 .add(transactionCost)
                 .add(charges);
@@ -252,15 +239,14 @@ public class TransactionServiceImpl implements TransactionService {
             holding.setAvgBuyPrice(newAvgPrice);
             holding.setTotalInvested(totalCost);
 
-            // Recalculate current value
-            BigDecimal currentPrice = holding.getCurrentPrice() != null ? 
+            BigDecimal currentPrice = holding.getCurrentPrice() != null ?
                 holding.getCurrentPrice() : newAvgPrice;
             BigDecimal currentValue = currentPrice.multiply(totalQty);
             holding.setCurrentValue(currentValue);
-            
+
             BigDecimal unrealizedGain = currentValue.subtract(totalCost);
             holding.setUnrealizedGain(unrealizedGain);
-            
+
             BigDecimal unrealizedGainPercent = totalCost.compareTo(BigDecimal.ZERO) > 0 ?
                 unrealizedGain.multiply(new BigDecimal(100))
                     .divide(totalCost, 4, RoundingMode.HALF_UP) :
@@ -271,35 +257,31 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    private void handleSellTransaction(TransactionRequest request, Transaction transaction) {
+    private void handleSellTransaction(String clerkUserId, TransactionRequest request, Transaction transaction) {
         Holding holding = holdingRepository
-            .findByUserIdAndAssetSymbol(request.getUserId(), request.getAssetSymbol())
+            .findByClerkUserIdAndAssetSymbol(clerkUserId, request.getAssetSymbol())
             .orElseThrow(() -> new RuntimeException("No holding found for " + request.getAssetSymbol()));
 
         if (holding.getQuantity().compareTo(request.getQuantity()) < 0) {
             throw new RuntimeException("Insufficient quantity to sell");
         }
 
-        // Calculate FIFO gain
         FIFOCalculationResult fifoResult = calculateFIFOGain(
-            request.getUserId(),
+            clerkUserId,
             request.getAssetSymbol(),
             request.getQuantity(),
             request.getPricePerUnit()
         );
 
-        // Update holding quantity
         BigDecimal newQty = holding.getQuantity().subtract(request.getQuantity());
         holding.setQuantity(newQty);
 
         if (newQty.compareTo(BigDecimal.ZERO) == 0) {
-            // Sold everything
             holding.setTotalInvested(BigDecimal.ZERO);
             holding.setCurrentValue(BigDecimal.ZERO);
             holding.setUnrealizedGain(BigDecimal.ZERO);
             holding.setUnrealizedGainPercent(BigDecimal.ZERO);
         } else {
-            // Recalculate proportionally
             BigDecimal costBasisRemoved = fifoResult.getTotalCostBasis();
             BigDecimal newTotalInvested = holding.getTotalInvested().subtract(costBasisRemoved);
             holding.setTotalInvested(newTotalInvested);
@@ -320,26 +302,21 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         holdingRepository.save(holding);
-
-        // Store realized gain in transaction (optional - add field to Transaction entity if needed)
         log.info("SELL completed. Realized gain: {}", fifoResult.getTotalRealizedGain());
     }
 
-    private void handleBonusOrSplit(TransactionRequest request) {
+    private void handleBonusOrSplit(String clerkUserId, TransactionRequest request) {
         Holding holding = holdingRepository
-            .findByUserIdAndAssetSymbol(request.getUserId(), request.getAssetSymbol())
+            .findByClerkUserIdAndAssetSymbol(clerkUserId, request.getAssetSymbol())
             .orElseThrow(() -> new RuntimeException("No holding found for " + request.getAssetSymbol()));
 
-        // For bonus/split, increase quantity without changing total invested
         BigDecimal newQty = holding.getQuantity().add(request.getQuantity());
         holding.setQuantity(newQty);
 
-        // Recalculate average price (total invested stays same, quantity increased)
         BigDecimal newAvgPrice = holding.getTotalInvested()
             .divide(newQty, 2, RoundingMode.HALF_UP);
         holding.setAvgBuyPrice(newAvgPrice);
 
-        // Recalculate current value
         BigDecimal currentPrice = holding.getCurrentPrice() != null ?
             holding.getCurrentPrice() : newAvgPrice;
         BigDecimal currentValue = currentPrice.multiply(newQty);
@@ -358,10 +335,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private void reverseTransactionEffect(Transaction transaction) {
-        // Implementation depends on transaction type
-        // For BUY: reduce quantity from holding
-        // For SELL: add back quantity to holding
-        // This is complex - implement based on your requirements
         log.warn("Transaction reversal not fully implemented yet");
     }
 }

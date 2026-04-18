@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TransactionService {
     
-    TransactionResponse recordTransaction(TransactionRequest request);
+    TransactionResponse recordTransaction(String clerkUserId, TransactionRequest request);
     
     List<TransactionResponse> getUserTransactions(String userId);
     

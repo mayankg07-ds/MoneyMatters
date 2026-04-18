@@ -12,25 +12,25 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findByUserId(String userId);
+    List<Transaction> findByClerkUserId(String clerkUserId);
 
-    List<Transaction> findByUserIdOrderByTransactionDateDesc(String userId);
+    List<Transaction> findByClerkUserIdOrderByTransactionDateDesc(String clerkUserId);
 
-    List<Transaction> findByUserIdAndAssetSymbol(String userId, String assetSymbol);
+    List<Transaction> findByClerkUserIdAndAssetSymbol(String clerkUserId, String assetSymbol);
 
-    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId " +
+    @Query("SELECT t FROM Transaction t WHERE t.clerkUserId = :clerkUserId " +
            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
            "ORDER BY t.transactionDate DESC")
-    List<Transaction> findByUserIdAndDateRange(
-        @Param("userId") String userId,
+    List<Transaction> findByClerkUserIdAndDateRange(
+        @Param("clerkUserId") String clerkUserId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId " +
+    @Query("SELECT t FROM Transaction t WHERE t.clerkUserId = :clerkUserId " +
            "AND t.assetSymbol = :assetSymbol " +
            "AND t.transactionType = 'BUY' " +
            "ORDER BY t.transactionDate ASC")
     List<Transaction> findBuyTransactionsForAsset(
-        @Param("userId") String userId,
+        @Param("clerkUserId") String clerkUserId,
         @Param("assetSymbol") String assetSymbol);
 }

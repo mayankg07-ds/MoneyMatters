@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HoldingService {
     
-    HoldingResponse createHolding(HoldingRequest request);
+    HoldingResponse createHolding(String clerkUserId, HoldingRequest request);
     
     HoldingResponse updateHolding(Long id, HoldingRequest request);
     

@@ -34,7 +34,7 @@ public class HoldingResponse {
     public static HoldingResponse fromEntity(Holding holding) {
         return new HoldingResponse(
             holding.getId(),
-            holding.getUserId(),
+            holding.getClerkUserId(),
             holding.getAssetType(),
             holding.getAssetName(),
             holding.getAssetSymbol(),

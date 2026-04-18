@@ -15,9 +15,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TransactionRequest {
 
-    @NotBlank(message = "User ID required")
-    private String userId;
-
     @NotNull(message = "Transaction type required")
     private Transaction.TransactionType transactionType;
 

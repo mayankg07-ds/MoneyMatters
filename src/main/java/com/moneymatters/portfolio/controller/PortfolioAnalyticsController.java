@@ -3,10 +3,13 @@ package com.moneymatters.portfolio.controller;
 import com.moneymatters.common.dto.ApiResponse;
 import com.moneymatters.portfolio.dto.PortfolioAnalyticsResponse;
 import com.moneymatters.portfolio.service.PortfolioAnalyticsService;
+import com.moneymatters.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,29 +21,34 @@ import java.time.LocalDate;
 public class PortfolioAnalyticsController {
 
     private final PortfolioAnalyticsService analyticsService;
+    private final UserService userService;
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     public ResponseEntity<ApiResponse<PortfolioAnalyticsResponse>> getPortfolioAnalytics(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal Jwt jwt) {
 
-        log.info("Generating analytics for user: {}", userId);
+        String clerkUserId = jwt.getSubject();
+        userService.ensureUserExists(clerkUserId, jwt.getClaimAsString("email"));
+        log.info("Generating analytics for user: {}", clerkUserId);
 
-        PortfolioAnalyticsResponse analytics = analyticsService.getPortfolioAnalytics(userId);
+        PortfolioAnalyticsResponse analytics = analyticsService.getPortfolioAnalytics(clerkUserId);
 
         return ResponseEntity.ok(new ApiResponse<>(true, analytics,
             "Portfolio analytics generated successfully"));
     }
 
-    @GetMapping("/user/{userId}/date-range")
+    @GetMapping("/user/date-range")
     public ResponseEntity<ApiResponse<PortfolioAnalyticsResponse>> getAnalyticsForDateRange(
-            @PathVariable String userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @AuthenticationPrincipal Jwt jwt) {
 
-        log.info("Generating analytics for user {} from {} to {}", userId, startDate, endDate);
+        String clerkUserId = jwt.getSubject();
+        userService.ensureUserExists(clerkUserId, jwt.getClaimAsString("email"));
+        log.info("Generating analytics for user {} from {} to {}", clerkUserId, startDate, endDate);
 
         PortfolioAnalyticsResponse analytics = analyticsService
-            .getPortfolioAnalyticsForDateRange(userId, startDate, endDate);
+            .getPortfolioAnalyticsForDateRange(clerkUserId, startDate, endDate);
 
         return ResponseEntity.ok(new ApiResponse<>(true, analytics,
             "Portfolio analytics generated successfully"));

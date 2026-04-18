@@ -22,10 +22,11 @@ public class HoldingServiceTest {
     @Autowired
     private HoldingService holdingService;
 
+    private static final String TEST_USER = "test-user-unit-1";
+
     @Test
     void testCreateHolding() {
         HoldingRequest request = new HoldingRequest(
-            "user1",
             Holding.AssetType.STOCK,
             "Test Company",
             "TEST",
@@ -35,7 +36,7 @@ public class HoldingServiceTest {
             LocalDate.now()
         );
 
-        HoldingResponse response = holdingService.createHolding(request);
+        HoldingResponse response = holdingService.createHolding(TEST_USER, request);
 
         assertNotNull(response);
         assertNotNull(response.getId());
@@ -46,28 +47,27 @@ public class HoldingServiceTest {
 
     @Test
     void testGetPortfolioSummary() {
-        // Create multiple holdings
-        createTestHolding("user1", "STOCK1", Holding.AssetType.STOCK, 
+        createTestHolding("STOCK1", Holding.AssetType.STOCK,
             new BigDecimal("100"), new BigDecimal("1000"));
-        createTestHolding("user1", "STOCK2", Holding.AssetType.STOCK, 
+        createTestHolding("STOCK2", Holding.AssetType.STOCK,
             new BigDecimal("50"), new BigDecimal("2000"));
-        createTestHolding("user1", "BOND1", Holding.AssetType.BOND, 
+        createTestHolding("BOND1", Holding.AssetType.BOND,
             new BigDecimal("10"), new BigDecimal("10000"));
 
-        PortfolioSummaryResponse summary = holdingService.getPortfolioSummary("user1");
+        PortfolioSummaryResponse summary = holdingService.getPortfolioSummary(TEST_USER);
 
         assertNotNull(summary);
         assertEquals(3, summary.getTotalHoldings());
         assertTrue(summary.getTotalInvested().compareTo(BigDecimal.ZERO) > 0);
-        assertTrue(summary.getAssetTypeBreakdown().size() >= 2); // At least STOCK and BOND
+        assertTrue(summary.getAssetTypeBreakdown().size() >= 2);
     }
 
-    private void createTestHolding(String userId, String symbol, Holding.AssetType type,
+    private void createTestHolding(String symbol, Holding.AssetType type,
                                    BigDecimal quantity, BigDecimal price) {
         HoldingRequest request = new HoldingRequest(
-            userId, type, symbol + " Company", symbol, "NSE",
+            type, symbol + " Company", symbol, "NSE",
             quantity, price, LocalDate.now()
         );
-        holdingService.createHolding(request);
+        holdingService.createHolding(TEST_USER, request);
     }
 }

@@ -35,10 +35,10 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
         log.info("Generating portfolio analytics for user: {}", userId);
 
         // Get all holdings
-        List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
+        List<Holding> holdings = holdingRepository.findActiveHoldingsByClerkUserId(userId);
 
         // Get all transactions
-        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+        List<Transaction> transactions = transactionRepository.findByClerkUserId(userId);
 
         if (holdings.isEmpty() && transactions.isEmpty()) {
             return createEmptyAnalytics(userId);
@@ -138,10 +138,10 @@ public class PortfolioAnalyticsServiceImpl implements PortfolioAnalyticsService 
 
         // Filter transactions by date range
         List<Transaction> transactions = transactionRepository
-            .findByUserIdAndDateRange(userId, startDate, endDate);
+            .findByClerkUserIdAndDateRange(userId, startDate, endDate);
 
         // Get holdings (current state)
-        List<Holding> holdings = holdingRepository.findActiveHoldingsByUserId(userId);
+        List<Holding> holdings = holdingRepository.findActiveHoldingsByClerkUserId(userId);
 
         // Similar calculation as above, but filtered by date range
         // Implementation similar to getPortfolioAnalytics()

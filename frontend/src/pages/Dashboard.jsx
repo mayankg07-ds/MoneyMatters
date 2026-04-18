@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/react';
 import {
     Wallet, TrendingUp, ArrowUpRight, Percent,
     RefreshCw, Plus
@@ -32,8 +31,6 @@ export default function Dashboard() {
     const [transactions, setTransactions] = useState([]);
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { userId } = useAuth();
-
     useEffect(() => {
         loadData();
     }, []);
@@ -42,9 +39,9 @@ export default function Dashboard() {
         setLoading(true);
         try {
             const [sumRes, txRes, anaRes] = await Promise.allSettled([
-                holdingsApi.getSummary(userId),
-                transactionsApi.getByUser(userId),
-                analyticsApi.getByUser(userId),
+                holdingsApi.getSummary(),
+                transactionsApi.getByUser(),
+                analyticsApi.getByUser(),
             ]);
             if (sumRes.status === 'fulfilled') {
                 setSummary(sumRes.value.data.data);
