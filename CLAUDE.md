@@ -7,28 +7,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **MoneyMatters** is a full-stack Indian personal finance platform:
 - **Backend**: Spring Boot 3.2 (Java 17), port `8082`, context path `/api`
 - **Frontend**: React 19 + Vite, port `5173`
-- **Database**: H2 in-memory (dev) — all data is lost on restart
-- **Auth**: Clerk (frontend only — the backend has **no auth** and trusts `userId` from request params/body)
+- **Database**: H2 in-memory (dev, data lost on restart) / Railway PostgreSQL (prod) — credentials via env vars
+- **Auth**: Clerk (frontend) + Spring Security OAuth2 Resource Server (backend JWT validation)
 
 ## Commands
 
 ### Backend
 ```bash
-# Run (from repo root)
-./mvnw spring-boot:run
+# Run (from repo root) — load env vars first if using Railway DB
+set -a && source .env && set +a
+mvn spring-boot:run
 
 # Build (skip tests)
-./mvnw clean package -DskipTests
+mvn clean package -DskipTests
 
 # Run all tests
-./mvnw test
+mvn test
 
 # Run a single test class
-./mvnw test -Dtest=SIPCalculatorServiceTest
+mvn test -Dtest=SIPCalculatorServiceTest
 
 # Run a specific test method
-./mvnw test -Dtest=SIPCalculatorServiceTest#testBasicSIPCalculation
+mvn test -Dtest=SIPCalculatorServiceTest#testBasicSIPCalculation
 ```
+
+> Note: `mvnw` wrapper is in `.gitignore` and not present in the repo. Use system `mvn` instead.
 
 ### Frontend
 ```bash
@@ -57,9 +60,11 @@ npm run lint
 
 ```
 common/
-  config/       WebConfig (CORS for :5173/:3000), CacheConfig
+  config/       SecurityConfig (JWT auth), WebConfig (CORS — origins from env), CacheConfig
   dto/          ApiResponse<T> — uniform {success, data, message, timestamp} wrapper
   exception/    GlobalExceptionHandler (@RestControllerAdvice)
+
+user/           User entity + UserRepository + UserService (auto-creates user on first JWT request)
 
 calculators/    Stateless POST endpoints — no DB, pure math
   service/      FinancialMathService (FV/PV/EMI primitives), 6 calculator Impl classes
@@ -92,16 +97,20 @@ portfolio/      Stateful CRUD module
 FD, RD, PPF calculators are **frontend-only** (no backend endpoints).
 
 ### Portfolio Endpoints (all under `/api/v1/portfolio/`)
-- Holdings: `/holdings` (CRUD + `/user/{userId}/summary`, `/refresh-prices`)
-- Transactions: `/transactions` (supports BUY, SELL, DIVIDEND, BONUS, SPLIT)
-- Analytics: `/analytics/user/{userId}` (XIRR, CAGR, gainers/losers — cached per userId)
-- Stock Prices: `/prices/current/{symbol}`, `/prices/details/{symbol}`
+All portfolio endpoints require a valid Clerk JWT Bearer token. `userId` is extracted from `jwt.getSubject()` — never passed in the URL or body.
+
+- Holdings: `/holdings` (CRUD), `/holdings/user` (list), `/holdings/user/summary`, `/holdings/user/refresh-prices`
+- Transactions: `/transactions` (CRUD), `/transactions/user`, `/transactions/user/symbol/{symbol}` (supports BUY, SELL, DIVIDEND, BONUS, SPLIT)
+- Analytics: `/analytics/user` (XIRR, CAGR, gainers/losers — cached per userId), `/analytics/user/date-range`
+- Stock Prices: `/prices/current/{symbol}`, `/prices/details/{symbol}`, `/prices/update/user`
 
 ### Frontend Structure (`frontend/src/`)
-- `App.jsx` — router root; `ProtectedRoute` uses Clerk's `useAuth()`; unauthenticated users redirected to `/login`
+- `App.jsx` — router root; `ProtectedRoute` uses Clerk's `useAuth()`; calls `useAxiosInterceptor()` in `AppLayout` to attach JWT to every request
+- `services/setupAxiosInterceptor.js` — React hook that attaches Clerk `getToken()` as `Authorization: Bearer <token>` on all Axios requests
+- `services/api.js` — centralized Axios service layer; all portfolio API calls are here; no `userId` params (identity comes from JWT)
 - `pages/` — one file per route; calculator pages under `pages/calculators/`
 - `components/` — shared UI: `Sidebar`, `Toast`, `GradientText`; landing page sections under `components/landing/`
-- All API calls go through Axios; no centralized `api.js` service layer — calls are made directly in page components
+- `pages/Register.jsx` — uses Clerk's `<SignUp />` component; no custom form or localStorage
 
 ### Key Cross-Cutting Patterns
 
@@ -117,11 +126,28 @@ FD, RD, PPF calculators are **frontend-only** (no backend endpoints).
 
 **Transaction side effects**: Recording a transaction mutates the holding (BUY → weighted avg price; SELL → FIFO cost basis; BONUS/SPLIT → qty adjustment). Transaction deletion does **not** reverse these effects (known stub).
 
+### Authentication Pattern
+
+**Backend identity**: All controllers use `@AuthenticationPrincipal Jwt jwt` and extract the user via `jwt.getSubject()`. Never pass `userId` in URLs, request params, or body.
+
+**`clerkUserId` field**: `Holding` and `Transaction` entities store `clerkUserId` (Java field) mapped to `user_id` DB column via `@Column(name = "user_id")`. Repository methods are named `*ByClerkUserId*`.
+
+**UserService**: Call `userService.ensureUserExists(clerkUserId, email)` in mutation endpoints to auto-provision the `users` table row on first request.
+
+**Tests**: Integration tests use `SecurityMockMvcRequestPostProcessors.jwt()` from `spring-security-test` to inject a mock JWT — no real JWKS endpoint needed. Unit service tests pass a `TEST_USER` string constant directly to service methods.
+
+**Environment variables** (see `.env.example`):
+- `CLERK_JWK_SET_URI` — Clerk JWKS endpoint (default: `https://classic-quail-60.clerk.accounts.dev/.well-known/jwks.json`)
+- `CLERK_ISSUER_URI` — Clerk issuer (default: `https://classic-quail-60.clerk.accounts.dev`)
+- `CORS_ALLOWED_ORIGINS` — comma-separated allowed origins
+- `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` — PostgreSQL (prod)
+- `VITE_CLERK_PUBLISHABLE_KEY` — frontend env var for Clerk
+
 ## Known Issues / Gaps
 
-- **No backend authentication** — `userId` is trusted from the request; any caller can access any user's data
 - **Transaction reversal is stubbed** — deleting a transaction does not reverse its effect on the holding
 - **Date-range analytics is broken** — `getPortfolioAnalyticsForDateRange` ignores date params and returns full analytics
 - **Dashboard portfolio-growth chart uses simulated data** — not real historical values
 - **Settings page is unimplemented** — route exists, page is empty
-- **H2 only** — no Flyway/Liquibase, no PostgreSQL config, data resets on every restart
+- **No Flyway/Liquibase** — schema managed by `ddl-auto: update`; data resets on H2 restart
+- **H2 Console only in dev** — H2 console is disabled when connecting to Railway PostgreSQL
