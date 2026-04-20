@@ -54,4 +54,14 @@ export const calculatorsApi = {
   swp: (data) => API.post('/calculators/swp/calculate', data),
 };
 
+// ─── AI (Nemotron) ───
+export const aiApi = {
+  explainCalculator: (type, inputs, result) =>
+    API.post('/ai/explain-calculator', { type, inputs, result }),
+  analysePortfolio: () => API.post('/ai/analyse-portfolio'),
+  followup: (topic, context, question) =>
+    API.post('/ai/followup', { topic, context, question }),
+  quota: () => API.get('/ai/quota'),
+};
+
 export default API;

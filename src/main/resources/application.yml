@@ -16,13 +16,15 @@ spring:
     cache-names:
       - stockPrices
       - portfolioAnalytics
+      - stockFundamentals
+      - aiPortfolioAnalysis
 
   # Database Configuration (PostgreSQL via environment variables)
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/moneymatters}
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/moneymatters}}
     driver-class-name: org.postgresql.Driver
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:}
+    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:}}
     hikari:
       maximum-pool-size: 5
       connection-timeout: 20000
@@ -57,6 +59,19 @@ spring:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+# NVIDIA NIM (Nemotron) — used by the AI calculator explainer and portfolio analyser
+nvidia:
+  api-key: ${NVIDIA_API_KEY:}
+  api-url: ${NVIDIA_API_URL:https://integrate.api.nvidia.com/v1/chat/completions}
+  model: ${NVIDIA_MODEL:nvidia/nemotron-3-super-120b-a12b}
+  max-tokens: ${NVIDIA_MAX_TOKENS:1500}
+  temperature: ${NVIDIA_TEMPERATURE:0.6}
+
+# Per-user rate limiting for AI endpoints
+ai:
+  rate-limit:
+    max-requests-per-hour: ${AI_MAX_REQUESTS_PER_HOUR:10}
 
 # Server Configuration
 server:

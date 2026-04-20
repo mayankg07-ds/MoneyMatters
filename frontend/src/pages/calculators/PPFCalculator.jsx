@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -89,6 +90,11 @@ export default function PPFCalculator() {
                                 <div style={{ marginTop: 16, fontSize: '0.82rem', color: 'var(--text-secondary)', background: 'var(--bg-surface)', padding: 14, borderRadius: 'var(--border-radius-sm)' }}>
                                     <strong>Tax Benefit:</strong> PPF investment qualifies for deduction under Section 80C (up to ₹1.5L/year). Interest and maturity amount are fully tax-free (EEE status).
                                 </div>
+                                <ExplainButton
+                                    type="PPF"
+                                    inputs={{ annualInvestment: annual, tenureYears: tenure, ppfRate: PPF_RATE }}
+                                    result={result}
+                                />
                             </>
                         )}
                     </div>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -85,6 +86,11 @@ export default function RDCalculator() {
                                 <div style={{ marginTop: 24, height: 260 }}>
                                     <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8899aa' } } }, scales: { x: { stacked: true, ticks: { color: '#5a6f83' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#5a6f83' }, grid: { color: 'rgba(255,255,255,0.04)' } } } }} />
                                 </div>
+                                <ExplainButton
+                                    type="RD"
+                                    inputs={{ monthlyDeposit: monthly, interestRate: rate, tenureYears: tenure }}
+                                    result={result}
+                                />
                             </>
                         )}
                     </div>

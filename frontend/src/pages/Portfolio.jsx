@@ -7,6 +7,7 @@ import {
 import Header from '../components/Header';
 import { holdingsApi } from '../services/api';
 import { useToast } from '../components/Toast';
+import PortfolioAnalyser from '../components/ai/PortfolioAnalyser';
 import nifty500 from '../assets/nifty500.json';
 
 const formatCurrency = (v) => {
@@ -301,6 +302,8 @@ export default function Portfolio() {
                         </>
                     )}
                 </div>
+
+                <PortfolioAnalyser />
 
                 {/* Add/Edit Modal */}
                 {showModal && (

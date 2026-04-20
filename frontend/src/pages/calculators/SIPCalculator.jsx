@@ -5,6 +5,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip } from 'chart.js';
 import Header from '../../components/Header';
 import { calculatorsApi } from '../../services/api';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
 
@@ -107,6 +108,11 @@ export default function SIPCalculator() {
                                         </div>
                                     </div>
                                 )}
+                                <ExplainButton
+                                    type="SIP_STEPUP"
+                                    inputs={{ monthlySIPAmount: monthly, expectedReturnRate: rate, timePeriodYears: years, annualStepUpPercent: stepup }}
+                                    result={result}
+                                />
                             </>
                         ) : (
                             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>

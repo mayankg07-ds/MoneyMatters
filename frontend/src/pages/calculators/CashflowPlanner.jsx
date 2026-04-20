@@ -5,6 +5,7 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
 import { calculatorsApi } from '../../services/api';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -242,6 +243,11 @@ export default function CashflowPlanner() {
                                         </table>
                                     </div>
                                 </div>
+                                <ExplainButton
+                                    type="CASHFLOW"
+                                    inputs={{ incomes, expenses, projectionYears, incomeGrowth, expenseGrowth }}
+                                    result={result}
+                                />
                             </>
                         ) : (
                             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, flexDirection: 'column', gap: 16 }}>

@@ -826,6 +826,8 @@ textarea {
   animation: spin 0.8s linear infinite;
 }
 
+.spin { animation: spin 1s linear infinite; }
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
   from {

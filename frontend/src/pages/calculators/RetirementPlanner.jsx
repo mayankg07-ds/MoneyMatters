@@ -5,6 +5,7 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
 import { calculatorsApi } from '../../services/api';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -176,6 +177,11 @@ export default function RetirementPlanner() {
                                         <button className="btn btn-secondary" style={{ flex: 1 }}>Talk to Advisor</button>
                                     </div>
                                 </div>
+                                <ExplainButton
+                                    type="RETIREMENT"
+                                    inputs={{ currentAge: age, retirementAge: retireAge, lifeExpectancy: lifeExp, monthlyExpense: monthlyExp, expectedInflation: inflation, preRetirementReturn: preRoi, postRetirementReturn: postRoi }}
+                                    result={result}
+                                />
                             </>
                         ) : (
                             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, flexDirection: 'column', gap: 16 }}>

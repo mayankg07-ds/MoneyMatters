@@ -1,5 +1,6 @@
 package com.moneymatters.common.exception;
 
+import com.moneymatters.ai.exception.RateLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,19 @@ public class GlobalExceptionHandler {
         response.put("errors", errors);
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<?> handleRateLimit(RateLimitExceededException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("message", ex.getMessage());
+        response.put("limit", ex.getLimit());
+        response.put("retryAfterSeconds", ex.getRetryAfterSeconds());
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+            .body(response);
     }
 
     @ExceptionHandler(Exception.class)

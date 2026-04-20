@@ -5,6 +5,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
 import { calculatorsApi } from '../../services/api';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -221,6 +222,11 @@ export default function AssetAllocation() {
                                         </table>
                                     </div>
                                 </div>
+                                <ExplainButton
+                                    type="ASSET_ALLOCATION"
+                                    inputs={{ holdings, targets, freshInvestment: Number(freshInvestment || 0) }}
+                                    result={result}
+                                />
                             </>
                         ) : (
                             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, flexDirection: 'column', gap: 16 }}>

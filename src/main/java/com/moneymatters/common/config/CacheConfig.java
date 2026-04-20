@@ -12,6 +12,9 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("stockPrices", "portfolioAnalytics");
+        return new ConcurrentMapCacheManager(
+            "stockPrices", "portfolioAnalytics",
+            "stockFundamentals", "aiPortfolioAnalysis"
+        );
     }
 }

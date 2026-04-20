@@ -5,6 +5,7 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Filler, Tooltip, Legend } from 'chart.js';
 import Header from '../../components/Header';
 import { calculatorsApi } from '../../services/api';
+import ExplainButton from '../../components/ai/ExplainButton';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Filler, Tooltip, Legend);
 
@@ -254,6 +255,11 @@ export default function SWPCalculator() {
                                         </table>
                                     </div>
                                 </div>
+                                <ExplainButton
+                                    type="SWP"
+                                    inputs={{ startingCorpus: corpus, monthlyWithdrawal: withdrawal, expectedReturn: rate, durationYears: duration, inflationAdjusted: inflationAdj, inflationPercent: inflationAdj ? inflation : 0 }}
+                                    result={result}
+                                />
                             </>
                         ) : (
                             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, flexDirection: 'column', gap: 16 }}>
