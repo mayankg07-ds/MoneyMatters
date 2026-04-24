@@ -1,6 +1,3 @@
-I have a complete picture of the entire codebase. Here is the full, structured summary:
-
----
 
 ## MoneyMatters — Complete Codebase Summary
 
